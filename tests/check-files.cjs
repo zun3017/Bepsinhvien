@@ -8,7 +8,8 @@ for(const name of ['index.html','login.html','dashboard.html']) {
   const source=fs.readFileSync(path.join(root,name),'utf8');
   for(const [,value] of source.matchAll(/(?:src|href)="([^"]+)"/g)) {
     if(value.startsWith('#')||/^https?:/.test(value))continue;
-    assert.ok(fs.existsSync(path.join(root,value)),`${name}: thiếu ${value}`);
+    const localPath=value.split(/[?#]/)[0];
+    assert.ok(fs.existsSync(path.join(root,localPath)),`${name}: thiếu ${value}`);
     checked++;
   }
 }

@@ -1,91 +1,52 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bếp Sinh Viên · Ăn đủ bữa, vừa túi tiền</title>
-<meta name="description" content="Giao diện demo trợ lý lập kế hoạch ăn uống cho sinh viên theo ngân sách và số ngày.">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bếp Sinh Viên — giao diện minh họa kế hoạch bữa ăn, ngân sách và tận dụng nguyên liệu cho sinh viên.">
+  <meta name="theme-color" content="#286342">
+  <title>Bếp Sinh Viên · Ăn đủ bữa, vừa túi tiền</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <script defer src="js/home.js"></script>
 </head>
-<body>
-<a class="skip-link" href="#main">Tới nội dung</a>
-<div class="page-shell">
-<header class="public-nav">
-<a class="brand" href="index.html">
-<img src="assets/favicon.svg" alt="">Bếp Sinh Viên</a>
-<nav aria-label="Điều hướng">
-<a href="#how">Cách hoạt động</a>
-<a href="#features">Có gì trong Bếp?</a>
-<a class="btn" href="login.html">Đăng nhập</a>
-</nav>
-</header>
-<main id="main">
-<section class="hero">
-<div>
-<h1>Ăn đủ bữa,<br>
-<span>vừa túi tiền.</span>
-</h1>
-<p>Từ ngân sách đến bữa cơm mỗi ngày. Lên thực đơn, đi chợ có kế hoạch và tận dụng những gì còn trong tủ lạnh.</p>
-<div class="actions">
-<a class="btn primary" href="dashboard.html">Khám phá bản demo <span aria-hidden="true">→</span>
-</a>
-<a class="btn" href="#how">Bếp hoạt động thế nào?</a>
-</div>
-<div class="hero-foot">Dành cho sinh viên · Giao diện minh họa · Chưa cần tài khoản</div>
-</div>
-<div class="hero-visual">
-<img src="assets/images/hero.jpg" alt="Một bữa ăn nhiều rau củ được chuẩn bị gọn gàng">
-<div class="hero-note">
-<small>Một kế hoạch mẫu</small>
-<strong class="number">500.000đ / 10 ngày</strong>
-<span class="badge">Chủ động từng bữa ăn</span>
-</div>
-</div>
-</section>
-<section class="public-section" id="features">
-<h2>Chuyện ăn uống, bớt một điều phải lo.</h2>
-<p>Giữ những thông tin cần thiết trong cùng một không gian.</p>
-<div class="feature-rows">
-<article>
-<h3>Biết hôm nay có thể chi bao nhiêu</h3>
-<p>Theo dõi số tiền còn lại và định mức mỗi ngày sau khi cập nhật chi tiêu.</p>
-</article>
-<article>
-<h3>Không phải nghĩ lại từ đầu mỗi bữa</h3>
-<p>Xem thực đơn mẫu theo bữa và gom nguyên liệu cần mua thành một danh sách.</p>
-</article>
-<article>
-<h3>Dùng hết trước khi mua thêm</h3>
-<p>Nhìn rõ nguyên liệu còn lại, lượng có thể dùng và những món sắp hết hạn.</p>
-</article>
-</div>
-</section>
-<section class="public-section" id="how">
-<h2>Từ một con số, đến một bữa cơm.</h2>
-<div class="feature-rows">
-<article>
-<h3>1. Đặt ngân sách của bạn</h3>
-<p>Chọn số tiền, số ngày và số bữa để hình dung kế hoạch phù hợp.</p>
-</article>
-<article>
-<h3>2. Chọn món, chuẩn bị đi chợ</h3>
-<p>Xem thực đơn, kiểm tra nguyên liệu đã có rồi chốt danh sách cần mua.</p>
-</article>
-<article>
-<h3>3. Cập nhật và tiếp tục</h3>
-<p>Ghi lại tiền đã chi, xem đồ còn lại và bắt đầu ngày tiếp theo.</p>
-</article>
-</div>
-<div class="hint mt">Đây là bản demo giao diện của dự án Tư duy tính toán. Thực đơn, hình ảnh và giá là dữ liệu minh họa; chưa kết nối dịch vụ AI hoặc cơ sở dữ liệu.</div>
-<a class="btn primary mt" href="dashboard.html">Vào Bếp xem thử <span aria-hidden="true">→</span>
-</a>
-</section>
-</main>
-<footer class="public-footer">
-<span>Bếp Sinh Viên · Dự án Tư duy tính toán</span>
-<span>Ăn có kế hoạch. Tận dụng có ý thức.</span>
-</footer>
-</div>
+<body class="home-page">
+  <a class="skip-link" href="#main">Bỏ qua menu, tới nội dung</a>
+  <header class="home-header"><div class="home-container home-header-inner">
+    <a class="brand" href="index.html" aria-label="Bếp Sinh Viên — Trang chủ"><img src="assets/favicon.svg" width="40" height="40" alt="">Bếp Sinh Viên</a>
+    <button class="icon-btn home-menu-toggle" id="home-menu-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="home-nav"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <nav id="home-nav" class="home-nav" aria-label="Điều hướng trang chủ"><a href="#a-day">Một ngày ở Bếp</a><a href="#how">Cách hoạt động</a><a href="#premium">Premium</a><a class="home-login" href="login.html">Đăng nhập <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a></nav>
+  </div></header>
+  <main id="main">
+    <section class="home-hero home-container" aria-labelledby="hero-title">
+      <div class="hero-copy"><h1 id="hero-title">Ăn đủ bữa,<br><span>vừa túi tiền.</span></h1><p>Hôm nay ăn gì, đi chợ mua bao nhiêu? <br>Bếp giúp bạn hình dung một kế hoạch vừa vặn — từ khoản tiền đầu tháng đến bữa cơm mỗi ngày.</p><div class="hero-actions"><a class="btn primary" href="dashboard.html">Khám phá bản demo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a><a class="home-inline-link" href="#how">Xem cách Bếp hoạt động</a></div><p class="hero-demo-note"><span class="demo-dot" aria-hidden="true"></span>Giao diện minh họa · Vào xem không cần tài khoản</p></div>
+      <div class="hero-scene"><img class="hero-food" src="assets/images/hero.jpg" width="1000" height="1000" fetchpriority="high" alt="Bữa ăn nhiều màu sắc với rau củ và đậu"><span class="photo-note">Ảnh bữa ăn minh họa</span><div class="hero-plan"><div class="hero-plan-title"><span>Kế hoạch mẫu của bạn</span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11h18c-1 6-4 9-9 9s-8-3-9-9ZM6 7h12M9 3v2m6-2v2"/></svg></div><p><strong>500.000<span>đ</span></strong><span>cho 10 ngày</span></p><div class="hero-plan-divider"></div><div class="hero-plan-bottom"><span>Ba bữa mỗi ngày.<br>Chủ động chi tiêu.</span><span class="plan-check" aria-label="Kế hoạch minh họa"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span></div></div><div class="hero-reuse"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 3c-9-2-16 1-16 8 0 5 5 8 9 5 4-2 6-6 7-13ZM4 21l11-12"/></svg><span>Dùng hết trước.<br>Mua thêm sau.</span></div></div>
+    </section>
+    <div class="home-container"><div class="home-intro-line"><p>Một kế hoạch. <strong>Từ ngân sách đến bữa cơm.</strong></p><a href="#a-day" aria-label="Khám phá một ngày ở Bếp"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16m-6-6 6 6 6-6"/></svg></a></div></div>
+    <section class="home-day home-container home-section" id="a-day" aria-labelledby="day-title">
+      <div class="home-section-heading"><div><h2 id="day-title">Một ngày ở Bếp.<br>Ít đắn đo, thêm vừa vặn.</h2><p>Thực đơn, khoản chi và những gì còn trong tủ lạnh —<br class="desktop-break"> nhìn cùng nhau mới dễ lên kế hoạch.</p></div><span class="home-sample-label">Dữ liệu minh họa · Ngày 3 / 10</span></div>
+      <div class="day-layout">
+        <article class="day-meal"><img src="assets/images/dinner.jpg" width="600" height="800" loading="lazy" alt="Tô thức ăn nhiều rau củ, minh họa cho khu vực thực đơn"><div class="day-meal-top"><span>Gợi ý cho bữa tối</span><span>Ảnh minh họa</span></div><div class="day-meal-content"><h3>Không cần nghĩ lại<br>từ đầu mỗi bữa.</h3><p>Món mẫu: Cơm trứng sốt cà chua</p><div class="meal-inline-meta"><span>15 phút chuẩn bị</span><strong>15.000đ <small>/ khẩu phần mẫu</small></strong></div><a class="btn" href="dashboard.html#menu">Xem thực đơn hôm nay <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a></div></article>
+        <article class="home-budget"><div class="home-card-heading"><h3>Tiền đi chợ, nhìn rõ hơn.</h3><span class="home-sample-label">Minh họa</span></div><div class="budget-inline"><div><span>Còn lại trong kế hoạch</span><strong>410.000<small>đ</small></strong></div><div><span>Định mức ngày 3</span><strong>51.250<small>đ</small></strong></div></div>
+          <figure class="home-chart" aria-labelledby="chart-caption"><figcaption id="chart-caption">Dự chi và thực chi hai ngày đầu <span>Đơn vị: nghìn đồng</span></figcaption><div class="chart-layout" role="img" aria-label="Ngày 1 dự chi 50.000đ, thực chi 47.000đ. Ngày 2 dự chi 50.000đ, thực chi 43.000đ. Dữ liệu minh họa."><div class="chart-scale" aria-hidden="true"><span>50k</span><span>25k</span><span>0</span></div><div class="home-bars"><div class="home-bar-group"><div class="home-bar-pair"><span class="bar-estimate" style="--bar-height:100%"><span>50</span></span><span class="bar-spent" style="--bar-height:94%"><span>47</span></span></div><span>Ngày 1</span></div><div class="home-bar-group"><div class="home-bar-pair"><span class="bar-estimate" style="--bar-height:100%"><span>50</span></span><span class="bar-spent" style="--bar-height:86%"><span>43</span></span></div><span>Ngày 2</span></div></div></div><div class="home-chart-legend"><span><i class="legend-estimate"></i>Dự chi</span><span><i class="legend-spent"></i>Thực chi</span></div></figure>
+          <details class="chart-data"><summary>Xem số liệu minh họa</summary><table><caption class="sr-only">Số liệu minh họa cho biểu đồ chi tiêu</caption><thead><tr><th>Ngày</th><th>Dự chi</th><th>Thực chi</th></tr></thead><tbody><tr><td>Ngày 1</td><td>50.000đ</td><td>47.000đ</td></tr><tr><td>Ngày 2</td><td>50.000đ</td><td>43.000đ</td></tr></tbody></table></details>
+        </article>
+        <article class="home-pantry"><div><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 3c-9-2-16 1-16 8 0 5 5 8 9 5 4-2 6-6 7-13ZM4 21l11-12"/></svg><h3>Trong tủ còn gì?</h3><p>Dùng đúng lúc, bớt bỏ quên.</p></div><ul><li><span>Cà chua <small>2 quả</small></span><span class="badge warn">Dùng hôm nay</span></li><li><span>Trứng gà <small>6 quả</small></span><span class="badge">Còn sử dụng được</span></li></ul><a class="home-inline-link" href="dashboard.html#fridge">Mở tủ lạnh mẫu <span aria-hidden="true">→</span></a></article>
+      </div>
+    </section>
+    <section class="home-how home-container home-section" id="how" aria-labelledby="how-title"><div class="home-section-heading"><h2 id="how-title">Bếp đi cùng bạn,<br>từng bước một.</h2><p>Không cần bắt đầu với một kế hoạch hoàn hảo.<br>Chỉ cần biết mình có gì, và muốn ăn trong bao lâu.</p></div><ol class="home-steps"><li><span class="step-number">1</span><h3>Đặt một khoản vừa sức.</h3><p>Chọn ngân sách, số ngày và số bữa. Nhìn thấy định mức trước khi chọn món.</p><a href="dashboard.html#setup">Thiết lập kế hoạch <span aria-hidden="true">↗</span></a></li><li><span class="step-number">2</span><h3>Chọn món, rồi mới đi chợ.</h3><p>Xem thực đơn và danh sách cần mua, đã tính đến nguyên liệu còn dùng được.</p><a href="dashboard.html#shopping">Xem danh sách đi chợ <span aria-hidden="true">↗</span></a></li><li><span class="step-number">3</span><h3>Ghi lại, tận dụng, tiếp tục.</h3><p>Cập nhật tiền thực chi và phần nguyên liệu dư để chuẩn bị cho ngày tiếp theo.</p><a href="dashboard.html#history">Khám phá nhật ký mẫu <span aria-hidden="true">↗</span></a></li></ol></section>
+    <section class="home-container home-section" id="premium" aria-labelledby="premium-title"><div class="home-premium"><div class="premium-copy"><h2 id="premium-title">Bếp Premium.<br>Thêm thấu hiểu,<br>bớt nhập tay.</h2><p>Những tiện ích dự kiến cho lúc bạn muốn hiểu bữa ăn của mình hơn — và dành ít thời gian ghi chép hơn.</p><ul class="premium-list"><li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H4l-2 2V11a9 9 0 0 1 19 0ZM7 11h.01m5 0h.01m5 0h.01"/></svg><span><strong>AI không giới hạn lượt hỏi</strong><small>Quyền lợi dự kiến của gói Premium.</small></span></li><li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M7 8h10M7 12h10m-10 4h6"/></svg><span><strong>Quét hóa đơn</strong><small>Kiểm tra dữ liệu trước khi cập nhật chi tiêu.</small></span></li><li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 3c-9-2-16 1-16 8 0 5 5 8 9 5 4-2 6-6 7-13ZM4 21l11-12"/></svg><span><strong>Hiểu món ăn mình thích</strong><small>Giải thích dinh dưỡng và cách phối hợp nguyên liệu.</small></span></li></ul><details class="premium-details"><summary>Xem thêm về trải nghiệm dự kiến</summary><p>AI sẽ hỗ trợ câu hỏi về bữa ăn. Hóa đơn có bước xem lại từng dòng; thông tin dinh dưỡng có giải thích và nguồn tham khảo. Hiện đây là phần giới thiệu giao diện, chưa có AI, OCR hoặc thanh toán thật. Giá gói chưa được công bố.</p></details></div><div class="premium-preview"><div class="receipt-visual" aria-label="Hóa đơn minh họa gồm trứng gà 18.000đ, cà chua 6.000đ và gạo 10.000đ, tổng 34.000đ"><div class="receipt-header"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11h18c-1 6-4 9-9 9s-8-3-9-9ZM6 7h12"/></svg><strong>BẾP XANH</strong><span>HÓA ĐƠN MINH HỌA</span></div><div class="receipt-items"><div><span>Trứng gà · 6 quả</span><b>18.000đ</b></div><div><span>Cà chua · 2 quả</span><b>6.000đ</b></div><div><span>Gạo · 500g</span><b>10.000đ</b></div></div><div class="receipt-sum"><span>Tổng cộng</span><strong>34.000đ</strong></div><div class="receipt-status"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>Kiểm tra trước khi lưu</div></div><div class="nutrition-visual"><div><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-11v6m0-10h.01"/></svg><strong>Món bạn thích có gì?</strong></div><p>Nhìn từ nguyên liệu, hiểu thêm về bữa ăn.</p><div><span>Đạm</span><span>Chất xơ</span><span>Vitamin</span></div></div><p class="premium-preview-note">Giao diện minh họa · Chưa kết nối AI hoặc OCR</p></div></div></section>
+    <section class="home-stories home-container home-section" aria-labelledby="stories-title"><div class="home-section-heading"><div><h2 id="stories-title">Mỗi lịch học,<br>một chuyện ăn uống.</h2><p>Những tình huống giả định để hình dung Bếp trong đời sống sinh viên.</p><span class="home-sample-label stories-disclosure">Nội dung minh họa · Không phải đánh giá khách hàng thật</span></div><div class="story-controls" hidden><button class="icon-btn" id="story-prev" aria-label="Xem tình huống trước" aria-controls="story-track"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6"/></svg></button><button class="story-pause" id="story-pause">Tạm dừng</button><button class="icon-btn" id="story-next" aria-label="Xem tình huống tiếp theo" aria-controls="story-track"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></button></div></div>
+      <div class="story-track" id="story-track" tabindex="0" role="region" aria-label="Các tình huống trải nghiệm minh họa, có thể cuộn ngang">
+        <article class="story-card"><div class="story-tag">Lịch học kín cả ngày</div><h3>“Chỉ muốn về là biết tối nay ăn gì.”</h3><p>Thực đơn và danh sách đi chợ nằm cùng một chỗ, để không phải quyết định lại khi đã mệt.</p><details><summary>Xem thêm tình huống</summary><p>Trong kịch bản, bạn xem món mẫu trước giờ tan học, mở danh sách cần mua và cập nhật khoản chi sau khi về. Không có lời chứng thực hay kết quả thực tế được khẳng định.</p></details><span class="story-context">Tình huống giả định · Sinh viên ở trọ</span></article>
+        <article class="story-card"><div class="story-tag">Cuối tháng cần cân đối</div><h3>“Muốn thấy tiền còn lại, trước khi mua thêm.”</h3><p>Đặt cạnh nhau ngân sách và thực chi để hình dung những ngày còn lại của kế hoạch.</p><details><summary>Xem thêm tình huống</summary><p>Ví dụ 500.000đ trong 10 ngày giúp trình bày giao diện ngân sách động. Mức chi là dữ liệu minh họa, không phải cam kết tiết kiệm cho người dùng thật.</p></details><span class="story-context">Tình huống giả định · Tự quản lý chi tiêu</span></article>
+        <article class="story-card"><div class="story-tag">Nấu cho một người</div><h3>“Còn vài quả trứng. Đừng để quên nữa.”</h3><p>Danh sách tủ lạnh nhắc những gì vẫn còn để cân nhắc sử dụng trước lần đi chợ mới.</p><details><summary>Xem thêm tình huống</summary><p>Thông tin số lượng và hạn dùng ở đây thuộc kịch bản demo. Khi dùng thực tế, người dùng vẫn cần kiểm tra tình trạng và điều kiện bảo quản thực phẩm.</p></details><span class="story-context">Tình huống giả định · Tập nấu ăn</span></article>
+        <article class="story-card"><div class="story-tag">Cùng chuẩn bị thuyết trình</div><h3>“Một vòng thao tác, thấy được cả ý tưởng.”</h3><p>Từ kế hoạch đến thực đơn, mua sắm và tủ lạnh — đủ để kể câu chuyện của dự án.</p><details><summary>Xem thêm tình huống</summary><p>Nhóm có thể dùng dữ liệu mẫu để trình diễn các màn hình. Backend, cơ sở dữ liệu và các chức năng AI thật thuộc giai đoạn phát triển tiếp theo.</p></details><span class="story-context">Tình huống giả định · Nhóm dự án</span></article>
+      </div><div class="story-footer"><p>Chuyện được dựng để giới thiệu cách dùng, không đại diện cho khách hàng thật.</p><span id="story-position" role="status" aria-live="polite" aria-atomic="true">1 / 4</span></div>
+    </section>
+    <section class="home-container home-final-section"><div class="home-final"><div><h2>Bữa tới, thử có kế hoạch nhé?</h2><p>Vào Bếp xem một ngân sách được nối với thực đơn và tủ lạnh như thế nào.</p></div><a class="btn primary" href="dashboard.html">Vào Bếp xem thử <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a></div><p class="home-final-note">Đây là bản demo frontend của dự án Tư duy tính toán. Giá, chỉ số và tình huống là minh họa; chưa kết nối dịch vụ AI, OCR hoặc cơ sở dữ liệu.</p></section>
+  </main>
+  <footer class="home-container home-footer"><div><a class="brand" href="index.html"><img src="assets/favicon.svg" width="32" height="32" alt="">Bếp Sinh Viên</a><p>Ăn có kế hoạch. Tận dụng có ý thức.</p></div><nav aria-label="Liên kết cuối trang"><a href="#how">Cách hoạt động</a><a href="#premium">Premium dự kiến</a><a href="dashboard.html">Bản demo</a></nav><span>Dự án Tư duy tính toán</span></footer>
 </body>
 </html>

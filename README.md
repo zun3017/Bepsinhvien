@@ -2,6 +2,8 @@
 
 Mở **dashboard.html** để trình diễn ngay hoặc **index.html** để bắt đầu từ trang giới thiệu. Không cần cài thư viện, không cần mạng: ảnh và font đã đặt trong assets.
 
+Trang chủ mới có hero, nội dung lớn/nhỏ, biểu đồ hai ngày mẫu, giới thiệu Premium dự kiến và dải tình huống minh họa. Các nút trước/sau, tạm dừng/tiếp tục và xem thêm hoạt động ngay trên trình duyệt. `css/home.css` và `js/home.js` chỉ áp dụng cho trang chủ; không thay đổi dữ liệu, thuật toán hoặc luồng dashboard. Tự chuyển dải nội dung được tắt mặc định khi bật chế độ giảm chuyển động, và tạm dừng khi thao tác bằng bàn phím.
+
 ## Nội dung
 
 - index.html: giới thiệu dự án.
