@@ -21,3 +21,11 @@ Rê chuột, focus bàn phím hoặc chạm chú giải sẽ đổi giá trị g
 Detector chạy một lần, còn cảnh báo khoảng cách dưới một mục danh sách từ hệ thống style hiện có. Bố cục thực tế đã được xem lại; mục cuối trên mobile không có đường viền dưới nên không cần khoảng đệm sau đường viền. Không dùng cảnh báo này làm lý do sửa style chung của dashboard.
 
 Chưa kiểm tra Safari/Firefox hoặc thiết bị vật lý. Không thêm thư viện, API hay thay đổi logic ứng dụng.
+
+## Bổ sung sau phản hồi về khu vực Premium và các thẻ tình huống
+
+Nguyên nhân: danh sách selector ban đầu chưa gồm nutrition-visual, premium-feature và story-card. Vì vậy chỉ tờ hóa đơn trong khu vực Premium nhận hiệu ứng, còn các mục quyền lợi và thẻ tình huống chỉ có nội dung tĩnh.
+
+Đã đưa các thẻ còn thiếu vào cơ chế con trỏ chung. Các thẻ tình huống có viền nhấn, bóng và nghiêng nhẹ; thẻ dinh dưỡng và bản xem trước hội thoại có nghiêng và nhấn màu theo vị trí trỏ. Ba quyền lợi Premium là nút thực, có hover/focus và trạng thái chọn, đổi bản xem trước giữa hội thoại, hóa đơn và dinh dưỡng. Giữ nguyên dashboard và dữ liệu.
+
+Đã dùng công cụ hover thật của Chrome DevTools trên nút Premium và tiêu đề trong thẻ tình huống: xác nhận :hover, lớp phản hồi con trỏ, màu nền/viền và bóng thay đổi. Thử đủ ba chế độ xem trước ở desktop, mobile 390px và 320px, không tràn ngang. Reduced-motion tắt transform và console không báo lỗi. Cảnh báo khoảng cách danh sách từ style hiện có vẫn còn, không coi detector là kết quả sạch.

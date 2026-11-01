@@ -45,8 +45,8 @@
     });
   }else revealAll();
 
-  const tilts=[...document.querySelectorAll('.hero-scene,.day-meal,.receipt-visual,.donut-wrap')];
-  const glints=[...document.querySelectorAll('.ring-card,.home-budget,.home-pantry')];
+  const tilts=[...document.querySelectorAll('.hero-scene,.day-meal,.receipt-visual,.donut-wrap,.nutrition-visual,.premium-chat-preview,.story-card')];
+  const glints=[...document.querySelectorAll('.ring-card,.home-budget,.home-pantry,.home-premium,.nutrition-visual,.premium-chat-preview,.premium-feature,.story-card')];
   tilts.forEach(item=>item.classList.add('pointer-tilt'));
   glints.forEach(item=>item.classList.add('pointer-glint'));
   const interactive=[...new Set([...tilts,...glints])];
@@ -76,4 +76,20 @@
   motion.addEventListener('change',()=>{resetEffects();if(motion.matches){revealObserver?.disconnect();revealAll();}});
   finePointer.addEventListener('change',resetEffects);
   window.addEventListener('blur',resetEffects);
+
+  const preview=document.querySelector('#premium-preview');
+  const featureButtons=[...document.querySelectorAll('[data-premium-preview]')];
+  if(preview){
+    const messages={chat:'Bắt đầu cuộc trò chuyện từ khẩu vị và nguyên liệu của bạn.',receipt:'Từ nguyên liệu đến bữa ăn, trong cùng một không gian.',nutrition:'Khám phá thành phần và cách phối hợp trong món bạn yêu thích.'};
+    function selectFeature(mode){
+      preview.dataset.preview=mode;
+      preview.querySelector('.premium-chat-preview').hidden=mode!=='chat';
+      preview.querySelector('.receipt-visual').hidden=mode!=='receipt';
+      preview.querySelector('.nutrition-visual').hidden=mode==='chat';
+      preview.querySelector('.premium-preview-note').textContent=messages[mode];
+      featureButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.premiumPreview===mode)));
+      resetEffects();
+    }
+    featureButtons.forEach(button=>button.addEventListener('click',()=>selectFeature(button.dataset.premiumPreview)));
+  }
 })();
