@@ -1,0 +1,19 @@
+# Thông tin bí mật và cấu hình cá nhân khi nối backend sau này
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Thư viện và dữ liệu tạm
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.log
+.DS_Store
+Thumbs.db
+
+# Bản chụp kiểm tra giao diện
+docs/preview-*.png

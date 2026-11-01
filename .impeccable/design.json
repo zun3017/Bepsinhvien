@@ -1,0 +1,9 @@
+{
+  "name": "Bếp Sinh Viên",
+  "mode": "operate",
+  "colors": {"background":"#f7f8f4","surface":"#ffffff","text":"#203329","muted":"#526158","primary":"#286342","soft":"#eaf2e8","border":"#e2e7df"},
+  "typography": {"family":"Be Vietnam Pro","body":14,"title":30,"minimumLabel":12},
+  "spacing": [4,8,12,16,24,32,48],
+  "radius": {"panel":14,"button":9},
+  "layout": {"sidebar":238,"tabletBreakpoint":960,"mobileBreakpoint":650}
+}

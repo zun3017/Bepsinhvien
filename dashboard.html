@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Bản demo Bếp Sinh Viên — lập kế hoạch ăn uống, theo dõi ngân sách và tận dụng nguyên liệu.">
+<title>Tổng quan · Bếp Sinh Viên</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/chatbot.css">
+<script defer src="js/demo-data.js">
+</script>
+<script defer src="js/app.js">
+</script>
+<script defer src="js/planner-ui.js">
+</script>
+<script defer src="js/chatbot-ui.js">
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Bỏ qua menu, tới nội dung</a>
+<div class="sidebar-overlay" id="sidebar-overlay" hidden>
+</div>
+<aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+<a class="brand" href="index.html">
+<img src="assets/favicon.svg" alt="">Bếp Sinh Viên</a>
+<p class="sidebar-caption">Ăn ngon. Chi tiêu vừa đủ.</p>
+<nav id="main-nav">
+</nav>
+<div class="sidebar-bottom">
+<div class="sidebar-tip">
+<span data-icon="leaf">
+</span>
+<strong>Một chút tận dụng,<br>thêm nhiều tiết kiệm.</strong>
+<p>Kiểm tra tủ lạnh trước khi lên danh sách đi chợ nhé.</p>
+<button class="text-btn" data-go="fridge">Mở tủ lạnh <span data-icon="arrow">
+</span>
+</button>
+</div>
+<a class="sidebar-home" href="index.html">
+<span data-icon="external">
+</span> Giới thiệu dự án</a>
+</div>
+</aside>
+<div class="app-shell">
+<header class="topbar">
+<div class="row">
+<button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Mở menu" aria-controls="sidebar" aria-expanded="false">
+<span data-icon="menu">
+</span>
+</button>
+<span class="breadcrumb">Không gian của bạn <span>/</span>
+<strong id="breadcrumb-current">Tổng quan</strong>
+</span>
+</div>
+<div class="header-actions">
+<span class="badge demo-badge">Bản demo</span>
+<button class="icon-btn notification-button" id="notifications-btn" aria-label="Thông báo" aria-expanded="false" aria-controls="notifications">
+<span data-icon="bell">
+</span>
+<i id="notification-dot">
+</i>
+</button>
+<button class="icon-btn" data-drawer="settings" aria-label="Cài đặt">
+<span data-icon="settings">
+</span>
+</button>
+<span class="header-divider">
+</span>
+<button class="account-button" data-drawer="profile" aria-label="Tài khoản cá nhân">
+<span class="avatar" id="header-avatar">MA</span>
+<span class="account-label">
+<strong id="header-name">Minh Anh</strong>
+<small>Tài khoản demo</small>
+</span>
+<span data-icon="chevron">
+</span>
+</button>
+</div>
+<section class="notification-popover" id="notifications" aria-label="Thông báo" hidden>
+</section>
+</header>
+<main id="main" class="main-content" tabindex="-1">
+<div id="view">
+</div>
+<footer class="app-footer">
+<span>Bếp Sinh Viên <span class="footer-dot">·</span> Dự án Tư duy tính toán</span>
+<button class="text-btn" data-drawer="guide">
+<span data-icon="help">
+</span> Hướng dẫn 8 bước</button>
+</footer>
+</main>
+</div>
+<div class="floating-tools">
+<button class="support-button" id="support-btn" aria-label="Hỗ trợ Zalo">Zalo</button>
+<button class="assistant-button" id="chat-toggle" aria-expanded="false" aria-controls="chat-panel">
+<span data-icon="chat">
+</span>
+<span>Hỏi Bếp một chút</span>
+</button>
+</div>
+<section class="chat-panel" id="chat-panel" hidden aria-label="Trợ lý Bếp Sinh Viên">
+<header>
+<div class="row">
+<span class="chat-avatar" data-icon="chef">
+</span>
+<div>
+<strong>Bếp ở đây!</strong>
+<small>Phản hồi mẫu · Chưa kết nối AI</small>
+</div>
+</div>
+<button class="icon-btn" id="chat-close" aria-label="Đóng trợ lý">
+<span data-icon="close">
+</span>
+</button>
+</header>
+<div class="chat-messages" id="chat-messages" role="log" aria-live="polite">
+<div class="message assistant">Chào bạn! Muốn tận dụng nguyên liệu hay lên ý tưởng cho bữa tối? Chọn một câu hỏi để xem thử nhé.</div>
+</div>
+<div class="chat-suggestions">
+<button data-chat="Tủ lạnh còn gì nấu nhanh?">Tủ lạnh còn gì nấu nhanh?</button>
+<button data-chat="Thay thịt gà bằng gì?">Thay thịt gà bằng gì?</button>
+<button data-chat="Hôm nay tôi chi 48.000đ">Nhập nhanh chi tiêu</button>
+</div>
+<form id="chat-form">
+<label class="sr-only" for="chat-input">Tin nhắn</label>
+<input id="chat-input" maxlength="500" placeholder="Nhắn với Bếp…" required autocomplete="off">
+<button class="icon-btn" aria-label="Gửi tin nhắn">
+<span data-icon="send">
+</span>
+</button>
+</form>
+</section>
+<dialog id="drawer" class="drawer">
+<header>
+<h2 id="drawer-title">
+</h2>
+<button class="icon-btn" id="drawer-close" aria-label="Đóng bảng">
+<span data-icon="close">
+</span>
+</button>
+</header>
+<div id="drawer-content">
+</div>
+</dialog>
+<dialog id="confirm-dialog" class="confirm-dialog">
+<h2 id="confirm-title">Xác nhận thao tác</h2>
+<p id="confirm-message">
+</p>
+<div class="actions">
+<button class="btn" id="confirm-cancel">Hủy</button>
+<button class="btn primary" id="confirm-ok">Xác nhận</button>
+</div>
+</dialog>
+<div id="toast" class="toast" role="status" hidden>
+</div>
+<noscript>
+<p class="hint">Bật JavaScript để chuyển mục và thử các tương tác demo.</p>
+</noscript>
+</body>
+</html>

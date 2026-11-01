@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đăng nhập · Bếp Sinh Viên</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script defer src="js/login.js">
+</script>
+</head>
+<body>
+<div class="page-shell">
+<header class="public-nav">
+<a class="brand" href="index.html">
+<img src="assets/favicon.svg" alt="">Bếp Sinh Viên</a>
+<a class="text-btn" href="index.html">Về trang giới thiệu</a>
+</header>
+<main class="login-layout">
+<section class="login-story">
+<h1>Bữa cơm nhỏ.<br>Kế hoạch vừa vặn.</h1>
+<p>Chủ động ngân sách, bớt lãng phí và dành thời gian cho những điều bạn thích.</p>
+<img src="assets/images/hero.jpg" alt="Bữa ăn nhiều rau củ, hình ảnh minh họa">
+<p class="mt">
+<strong class="green">Một nơi cho cả kế hoạch ăn uống.</strong>
+<br>Từ thực đơn hôm nay đến những gì còn trong tủ lạnh.</p>
+</section>
+<section class="login-form">
+<h1 id="auth-title">Chào mừng về Bếp.</h1>
+<p id="auth-description">Cùng chuẩn bị cho bữa ăn tiếp theo nhé.</p>
+<div class="segmented" aria-label="Chọn biểu mẫu">
+<button type="button" class="active" id="login-tab" aria-pressed="true">Đăng nhập</button>
+<button type="button" id="register-tab" aria-pressed="false">Đăng ký</button>
+</div>
+<div class="hint">Biểu mẫu minh họa, chưa có xác thực. Không nhập mật khẩu thật.</div>
+<form id="auth-form">
+<label class="field" id="name-field" hidden>Họ và tên<input id="auth-name" autocomplete="name" maxlength="60" placeholder="Tên của bạn">
+</label>
+<label class="field">Email<input type="email" id="auth-email" autocomplete="off" placeholder="ban@example.com" required maxlength="100">
+</label>
+<label class="field">Mật khẩu minh họa<input type="password" id="auth-password" autocomplete="off" placeholder="Tối thiểu 6 ký tự bất kỳ" minlength="6" required maxlength="100">
+</label>
+<button class="btn primary" id="auth-submit">Xem giao diện sau đăng nhập</button>
+<p id="auth-status" class="muted" role="status">
+</p>
+</form>
+<div class="divider">hoặc bỏ qua biểu mẫu</div>
+<a class="btn subtle" href="dashboard.html">Vào bằng tài khoản demo <span aria-hidden="true">→</span>
+</a>
+<p class="login-note">Không gửi thông tin đăng nhập. Không lưu mật khẩu.<br>Dữ liệu mẫu chỉ nằm trên trình duyệt của bạn.</p>
+</section>
+</main>
+</div>
+</body>
+</html>
