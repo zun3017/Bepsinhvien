@@ -29,3 +29,11 @@ Nguyên nhân: danh sách selector ban đầu chưa gồm nutrition-visual, prem
 Đã đưa các thẻ còn thiếu vào cơ chế con trỏ chung. Các thẻ tình huống có viền nhấn, bóng và nghiêng nhẹ; thẻ dinh dưỡng và bản xem trước hội thoại có nghiêng và nhấn màu theo vị trí trỏ. Ba quyền lợi Premium là nút thực, có hover/focus và trạng thái chọn, đổi bản xem trước giữa hội thoại, hóa đơn và dinh dưỡng. Giữ nguyên dashboard và dữ liệu.
 
 Đã dùng công cụ hover thật của Chrome DevTools trên nút Premium và tiêu đề trong thẻ tình huống: xác nhận :hover, lớp phản hồi con trỏ, màu nền/viền và bóng thay đổi. Thử đủ ba chế độ xem trước ở desktop, mobile 390px và 320px, không tràn ngang. Reduced-motion tắt transform và console không báo lỗi. Cảnh báo khoảng cách danh sách từ style hiện có vẫn còn, không coi detector là kết quả sạch.
+
+## Chuyển động độc lập với con trỏ
+
+Theo phản hồi tiếp theo, trang chủ bổ sung chuyển động nhìn thấy được cả khi không rê chuột: thẻ kế hoạch và đồ họa Premium nhấp nhô, hóa đơn đung đưa; ảnh có dịch chuyển theo vị trí cuộn. Các tiêu đề, khối nội dung, bước sử dụng và thẻ tình huống xuất hiện theo từng nhịp khi vào khung nhìn. Biểu đồ cột tăng chiều cao và các cung tròn được vẽ dần khi xuất hiện.
+
+Chuyển động con trỏ dùng transform, hiệu ứng xuất hiện dùng translate/scale riêng để không ghi đè nhau. requestAnimationFrame gộp xử lý cuộn, không tạo vòng render liên tục. Chuyển động nền chỉ chạy khi khối ở trong khung nhìn, dừng khi tab bị ẩn. Nút Tạm dừng hiệu ứng cho phép dừng các chuyển động nền; reduced-motion tắt hoạt ảnh và giữ nội dung hiển thị.
+
+Đã đo translate của thẻ kế hoạch và hóa đơn ở hai thời điểm để xác nhận chúng thực sự chuyển động. Đã thử tạm dừng, reduced-motion, hoạt ảnh cung tròn từ 0 đến độ dài cuối, mobile 390px và 320px không tràn ngang. Kiểm tra cung tròn phát hiện giá trị calc ở keyframe khiến Chrome chuyển giữa hai trạng thái thay vì nội suy dần. Đã đổi sang hai giá trị số có cùng định dạng; xác minh stroke-dasharray lần lượt là 0/100, khoảng 68,8/31,2 và 82/18 ở khung đầu/giữa/cuối.

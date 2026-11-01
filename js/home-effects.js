@@ -3,6 +3,8 @@
   'use strict';
   const motion=matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer=matchMedia('(hover: hover) and (pointer: fine)');
+  let motionPaused=false;
+  const motionOff=()=>motion.matches||motionPaused;
 
   document.querySelectorAll('[data-donut]').forEach(chart=>{
     const buttons=[...chart.querySelectorAll('[data-ring-part]')];
@@ -30,7 +32,13 @@
     show(0);
   });
 
-  const revealItems=[...document.querySelectorAll('.hero-food,.day-meal>img,.premium-preview,.ring-card')];
+  const revealItems=[...document.querySelectorAll('.hero-copy,.hero-food,.home-section-heading,.day-meal>img,.home-budget,.home-pantry,.premium-copy,.premium-preview,.ring-card,.home-steps li,.story-card,.home-final')];
+  document.querySelectorAll('.ring-card,.home-steps li,.story-card,.premium-feature').forEach((item,i)=>item.style.setProperty('--reveal-delay',(i%3)*100+'ms'));
+  document.querySelectorAll('.donut-segment').forEach(segment=>{
+    const length=Number(segment.getAttribute('stroke-dasharray').split(' ')[0]);
+    segment.style.setProperty('--arc-length',length);
+    segment.style.setProperty('--arc-gap',100-length);
+  });
   let revealObserver;
   const revealAll=()=>revealItems.forEach(item=>item.classList.add('is-revealed'));
   if('IntersectionObserver' in window&&!motion.matches){
@@ -64,7 +72,7 @@
   }
   interactive.forEach(item=>{
     item.addEventListener('pointermove',event=>{
-      if(!finePointer.matches||motion.matches||event.pointerType==='touch')return;
+      if(!finePointer.matches||motionOff()||event.pointerType==='touch')return;
       const rect=item.getBoundingClientRect();
       pending.set(item,{x:event.clientX-rect.left,y:event.clientY-rect.top,width:rect.width,height:rect.height});
       if(!frame)frame=requestAnimationFrame(renderPointer);
@@ -92,4 +100,44 @@
     }
     featureButtons.forEach(button=>button.addEventListener('click',()=>selectFeature(button.dataset.premiumPreview)));
   }
+
+  // Chuyển động khi cuộn, độc lập với hiệu ứng hover.
+  const progress=document.createElement('div');
+  progress.className='page-scroll-progress';progress.setAttribute('aria-hidden','true');document.body.append(progress);
+  const motionButton=document.createElement('button');
+  motionButton.type='button';motionButton.className='motion-toggle';document.body.append(motionButton);
+  const ambient=[...document.querySelectorAll('.hero-plan,.hero-reuse,.receipt-visual,.nutrition-visual')];
+  ambient.forEach(item=>item.classList.add('ambient-motion'));
+  if('IntersectionObserver' in window){
+    const ambientObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('is-in-view',entry.isIntersecting)),{threshold:0});
+    ambient.forEach(item=>ambientObserver.observe(item));
+  }else ambient.forEach(item=>item.classList.add('is-in-view'));
+  const images=[...document.querySelectorAll('.hero-food,.day-meal>img')];
+  let scrollFrame=0;
+  function updateScroll(){
+    scrollFrame=0;
+    const max=document.documentElement.scrollHeight-innerHeight;
+    progress.style.setProperty('--scroll-progress',max>0?Math.min(1,Math.max(0,scrollY/max)):0);
+    images.forEach(image=>{
+      const rect=image.getBoundingClientRect();
+      if(rect.bottom<0||rect.top>innerHeight)return;
+      const shift=motionOff()?0:Math.max(-20,Math.min(20,(innerHeight*.5-rect.top-rect.height*.5)*.055));
+      image.style.setProperty('--scroll-parallax',shift.toFixed(2)+'px');
+    });
+  }
+  function requestScroll(){if(!scrollFrame)scrollFrame=requestAnimationFrame(updateScroll);}
+  function syncMotion(){
+    const off=motionOff();document.body.classList.toggle('motion-paused',off);
+    motionButton.textContent=motion.matches?'Chuyển động đã giảm':off?'Bật chuyển động':'Tạm dừng hiệu ứng';motionButton.setAttribute('aria-pressed',String(off));
+    motionButton.disabled=motion.matches;
+    motionButton.title=motion.matches?'Đang theo cài đặt giảm chuyển động của thiết bị':'';
+    if(off){revealObserver?.disconnect();revealAll();resetEffects();images.forEach(image=>image.style.setProperty('--scroll-parallax','0px'));}
+    requestScroll();
+  }
+  motionButton.addEventListener('click',()=>{motionPaused=!motionPaused;syncMotion();});
+  motion.addEventListener('change',syncMotion);
+  document.addEventListener('visibilitychange',()=>document.body.classList.toggle('motion-hidden',document.hidden));
+  window.addEventListener('scroll',requestScroll,{passive:true});
+  window.addEventListener('resize',requestScroll);
+  syncMotion();
 })();
