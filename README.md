@@ -4,6 +4,8 @@ Mở **dashboard.html** để trình diễn ngay hoặc **index.html** để b�
 
 Trang chủ mới có hero, nội dung lớn/nhỏ, biểu đồ hai ngày mẫu, giới thiệu Premium dự kiến và dải tình huống minh họa. Các nút trước/sau, tạm dừng/tiếp tục và xem thêm hoạt động ngay trên trình duyệt. `css/home.css` và `js/home.js` chỉ áp dụng cho trang chủ; không thay đổi dữ liệu, thuật toán hoặc luồng dashboard. Tự chuyển dải nội dung được tắt mặc định khi bật chế độ giảm chuyển động, và tạm dừng khi thao tác bằng bàn phím.
 
+Theo yêu cầu phát triển tiếp, trang chủ không gắn nhãn demo vào nội dung người dùng nhìn thấy. `js/home-effects.js` bổ sung ba biểu đồ tròn tương tác, hiệu ứng hiện ảnh khi cuộn và phản hồi theo con trỏ; có phương án cho cảm ứng và reduced-motion. Các biểu đồ trên trang giới thiệu dùng giá trị cố định, không đồng bộ hoặc ghi vào kế hoạch. Chi tiết kiểm tra tại `docs/homepage-interactions.md`.
+
 ## Nội dung
 
 - index.html: giới thiệu dự án.
