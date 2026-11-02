@@ -54,19 +54,15 @@
   }else revealAll();
 
   const tilts=[...document.querySelectorAll('.hero-scene,.day-meal,.receipt-visual,.donut-wrap,.nutrition-visual,.premium-chat-preview,.story-card')];
-  const glints=[...document.querySelectorAll('.ring-card,.home-budget,.home-pantry,.home-premium,.nutrition-visual,.premium-chat-preview,.premium-feature,.story-card')];
   tilts.forEach(item=>item.classList.add('pointer-tilt'));
-  glints.forEach(item=>item.classList.add('pointer-glint'));
-  const interactive=[...new Set([...tilts,...glints])];
+  const interactive=tilts;
   const pending=new Map();
   let frame=0;
-  function reset(item){pending.delete(item);item.style.removeProperty('--tilt-x');item.style.removeProperty('--tilt-y');item.classList.remove('is-pointer-active');}
+  function reset(item){pending.delete(item);item.style.removeProperty('--tilt-x');item.style.removeProperty('--tilt-y');}
   function renderPointer(){
     frame=0;
     pending.forEach(({x,y,width,height},item)=>{
-      item.style.setProperty('--pointer-x',x+'px');item.style.setProperty('--pointer-y',y+'px');
       if(item.classList.contains('pointer-tilt')){item.style.setProperty('--tilt-x',((.5-y/height)*3).toFixed(2)+'deg');item.style.setProperty('--tilt-y',((x/width-.5)*4).toFixed(2)+'deg');}
-      item.classList.add('is-pointer-active');
     });
     pending.clear();
   }

@@ -8,9 +8,10 @@
   const photo=(d,cls='')=>`<img class="${cls}" src="assets/images/${d.image}" alt="Ảnh bữa ăn minh họa, không phải ảnh công thức cụ thể" loading="lazy">`;
   function expiry(i){const n=i.expiry-A.state.day;return n<0?['Đã hết hạn','danger']:n<=1?[n===0?'Dùng trong hôm nay':'Còn 1 ngày','warn']:['Còn '+n+' ngày',''];}
   const ingredientIcon=k=>k==='greens'?'leaf':k==='rice'?'box':'bowl';
-  const allowed=(d,s)=>!(s.preferences.includes('Ăn chay')&&d.needs.chicken)&&!(s.preferences.includes('Không trứng')&&d.needs.egg);
-  function adaptMenu(s){s.selected=s.selected.map((id,index)=>{if(allowed(Demo.dish(id),s))return id;return Demo.dishes.find(d=>allowed(d,s)&&(index===0?['bread','tofusandwich'].includes(d.id):!['bread','tofusandwich'].includes(d.id))).id;});}
+  const allowed=(d,s)=>Demo.allowed(d,s);
+  function adaptMenu(s){s.mealSlots=Demo.slots(s).slice(0,s.meals);if(s.mealSlots.length!==s.meals)s.mealSlots=Array.from({length:s.meals},(_,i)=>i);Demo.suggestMenu(s);}
   A.render=()=>{
+    if(Demo.repairMenu(A.state))A.save();
     const view=$('#view');view.innerHTML=(!A.storage?'<div class="hint warn storage-warning">Trình duyệt không cho lưu. Bản demo vẫn dùng được, nhưng tải lại trang sẽ mất thay đổi.</div>':'')+({overview,setup,menu,shopping,fridge,history}[A.tab])();
     if(A.tab==='setup')bindSetup();if(A.tab==='shopping')bindShopping();
   };
@@ -18,28 +19,172 @@
     return title(`Chào ${esc(s.name.split(' ').slice(-2).join(' '))}, hôm nay ăn gì?`,'Một bữa ăn vừa ý, một khoản chi vừa vặn.',`<span class="date-label">${icon('calendar')} Ngày ${s.day} trong kế hoạch ${s.days} ngày</span>`)+`
     <div class="overview-grid"><section class="panel budget-panel"><div class="budget-top"><h2>Ngân sách của bạn</h2>${icon('wallet')}</div><div class="budget-main number">${new Intl.NumberFormat('vi-VN').format(b.remaining)}<span>đ</span></div><p style="font-size:12px">Số tiền còn lại ${b.daysLeft?'cho '+b.daysLeft+' ngày chưa cập nhật':'khi hoàn thành kế hoạch'}</p><div class="budget-details"><div><small>Ngân sách ban đầu</small><strong class="number">${money(s.budget)}</strong></div><div><small>Đã chi tiêu</small><strong class="number">${money(b.spent)}</strong></div><div><small>${s.checkedOut?'Định mức ngày tiếp theo':'Định mức hôm nay'}</small><strong class="budget-daily number">${b.daysLeft?money(b.allowance):'Đã hoàn tất'}</strong></div></div></section>
     <section class="panel cycle-panel"><div><div class="row between"><h2 style="font-size:15px">Hành trình của bạn</h2>${icon('calendar')}</div><div class="cycle-day number">Ngày ${s.day} <span>/ ${s.days} ngày</span></div><div class="cycle-days" aria-label="Đã hoàn tất ${used} trên ${s.days} ngày">${Array.from({length:Math.min(s.days,30)},(_,i)=>`<span class="${(i+1)/Math.min(s.days,30)<=used/s.days?'done':(i+1)/Math.min(s.days,30)<=s.day/s.days?'current':''}"></span>`).join('')}</div><p class="cycle-note">${used} ngày đã cập nhật · ${s.days-used} ngày còn lại</p></div><button class="btn" data-action="advance" ${disabled(!s.checkedOut||s.day>=s.days)}>Kết thúc ngày & tiếp tục ${icon('arrow')}</button></section>
-    <section class="panel"><div class="panel-head"><div><h2>Thực đơn hôm nay</h2><p>${s.checkedOut?'Đã cập nhật bữa ăn và chi tiêu':s.confirmed?'Bạn đã chốt thực đơn':'Một vài gợi ý cho bữa ăn của bạn'}</p></div><button class="text-btn" data-go="menu" style="font-size:12px">Xem tất cả ${icon('arrow')}</button></div><div class="meal-mini-grid">${Demo.menu(s).map((d,i)=>`<article class="meal-mini">${photo(d)}<small>${['Bữa sáng','Bữa trưa','Bữa tối'][i]}</small><h3>${esc(d.name)}</h3><div class="row between"><span class="price number">${money(d.cost)}</span><span class="row time">${icon('clock')}${d.time} phút</span></div></article>`).join('')}</div><p class="caption">Ảnh bữa ăn và chi phí minh họa. Tổng dự chi: ${money(b.estimated)}.</p></section>
+    <section class="panel"><div class="panel-head"><div><h2>Thực đơn hôm nay</h2><p>${s.checkedOut?'Đã cập nhật bữa ăn và chi tiêu':s.confirmed?'Bạn đã chốt thực đơn':'Một vài gợi ý cho bữa ăn của bạn'}</p></div><button class="text-btn" data-go="menu" style="font-size:12px">Xem tất cả ${icon('arrow')}</button></div><div class="meal-mini-grid">${Demo.menu(s).map((d,i)=>`<article class="meal-mini">${photo(d)}<small>${['Bữa sáng','Bữa trưa','Bữa xế','Bữa tối'][Demo.slots(s)[i]||i]||'Bữa ăn'}</small><h3>${esc(d.name)}</h3><div class="row between"><span class="price number">${money(d.cost)}</span><span class="row time">${icon('clock')}${d.time} phút</span></div></article>`).join('')}</div><p class="caption">Ảnh bữa ăn và chi phí minh họa. Tổng dự chi: ${money(b.estimated)}.</p></section>
     <section class="panel"><div class="panel-head"><div><h2>Đừng quên trong tủ lạnh</h2><p>Dùng đúng lúc, bớt lãng phí</p></div>${icon('fridge')}</div>${alertItems.length?alertItems.slice(0,3).map(i=>{const [label,type]=expiry(i);return `<div class="fridge-alert"><span class="ingredient-symbol ${type}">${icon(ingredientIcon(i.key))}</span><div><strong>${esc(Demo.ingredients[i.key].name)}</strong><p>Còn ${qty(i.qty,Demo.ingredients[i.key].unit)}</p>${badge(label,type)}</div></div>`;}).join(''):'<p class="hint">Không có nguyên liệu cần dùng gấp. Kiểm tra lại trước khi mua thêm nhé.</p>'}<button class="text-btn" style="font-size:12px" data-go="fridge">Xem tủ lạnh của bạn ${icon('arrow')}</button><div class="leftover-note">${icon('leaf')}<span>Nguyên liệu hết hạn không được trừ vào danh sách cần mua.</span></div></section></div>
     <div class="overview-bottom"><div class="row">${icon('cart')}<div><h3>${s.checkedOut?'Hôm nay đã được ghi lại.':'Sẵn sàng cho chuyến đi chợ?'}</h3><p>${s.checkedOut?'Xem lại chi tiêu hoặc tiếp tục ngày mới.':'Danh sách nguyên liệu được trừ những gì bạn đã có.'}</p></div></div><button class="btn" data-go="${s.checkedOut?'history':'shopping'}" style="font-size:12px">${s.checkedOut?'Xem lịch sử':'Mở danh sách đi chợ'} ${icon('arrow')}</button></div>`;
   }
-  function setup(){const s=A.state,b=Demo.summary(s);return title('Lên kế hoạch, nhẹ đầu hơn.','Bắt đầu với số tiền và số ngày bạn muốn chủ động.')+`<div class="setup-grid"><form class="panel" id="plan-form"><section class="form-section"><h2>Kế hoạch ăn uống</h2><p class="mt" style="font-size:12px;margin-bottom:20px">Điền thông tin để xem định mức mẫu của bạn.</p><div class="form-grid"><label class="field">Tổng ngân sách (VNĐ)<input name="budget" id="plan-budget" type="number" min="40000" max="100000000" step="1" required value="${s.budget}"><small>Ví dụ: 500000 tương ứng 500.000đ.</small></label><label class="field">Số ngày ăn<input name="days" id="plan-days" type="number" min="1" max="365" step="1" required value="${s.days}"></label></div><div class="form-grid"><label class="field">Số bữa mỗi ngày<select name="meals"><option value="1" ${s.meals===1?'selected':''}>1 bữa — sáng</option><option value="2" ${s.meals===2?'selected':''}>2 bữa — sáng, trưa</option><option value="3" ${s.meals===3?'selected':''}>3 bữa — sáng, trưa, tối</option></select></label><label class="field">Khu vực sinh sống<select name="area"><option ${s.area.includes('Nguyễn')?'selected':''}>Quanh HCMUS — Nguyễn Văn Cừ</option><option ${s.area.includes('Thủ')?'selected':''}>Quanh HCMUS — Thủ Đức</option></select></label></div></section><section class="form-section"><h3>Khẩu vị & lựa chọn thực phẩm</h3><div class="actions">${['Không cay','Không hải sản','Không trứng','Ăn chay'].map(p=>`<label class="chip"><input type="checkbox" name="preference" value="${p}" ${s.preferences.includes(p)?'checked':''}>${p}</label>`).join('')}</div><p class="caption">Lựa chọn mẫu lọc món có trứng hoặc thịt gà. Chưa phải hệ thống kiểm chứng dị ứng của bản hoàn chỉnh.</p></section><section class="form-section"><div class="actions"><button class="btn primary" type="submit" name="mode" value="new">${icon('plus')} Tạo kế hoạch mới</button><button class="btn" type="submit" name="mode" value="edit">Chỉnh sửa kế hoạch</button></div><p class="form-error" id="plan-error" role="alert"></p></section></form><aside class="stack" style="align-content:start"><section class="panel"><h2>Kế hoạch nhìn nhanh</h2><div class="summary-line"><span>Ngân sách ban đầu</span><strong class="number" id="preview-budget">${money(s.budget)}</strong></div><div class="summary-line"><span>Thời gian</span><strong id="preview-days">${s.days} ngày</strong></div><div class="summary-total"><small>Định mức trung bình ban đầu</small><strong class="number" id="preview-allowance">${money(Math.floor(s.budget/s.days))}<small>/ ngày</small></strong></div><button type="button" class="btn full" id="calculate-budget">Tính định mức trung bình</button></section><div class="hint">Phạm vi dự án chọn mức từ 40.000đ/ngày. Đây là quy ước cho bài toán, không phải kết luận về nhu cầu dinh dưỡng.</div><p style="font-size:12px">Kế hoạch hiện tại đã chi ${money(b.spent)}. Tạo mới sẽ đặt lại thực đơn, lịch sử và tủ lạnh; chỉnh sửa giữ chi tiêu và tồn kho.</p></aside></div>`;}
-  function menu(){const s=A.state,b=Demo.summary(s);return title('Bữa ăn hôm nay của bạn.','Chọn món vừa ý, tận dụng những gì còn trong Bếp.',badge(s.checkedOut?'Đã cập nhật':s.confirmed?'Đã xác nhận':'Chưa xác nhận',s.confirmed?'':'neutral'))+`${s.preferences.length?`<div class="hint status-banner">Lựa chọn đã lưu: ${s.preferences.map(esc).join(' · ')}.</div>`:''}<div class="meal-grid">${Demo.menu(s).map((d,i)=>`<article class="panel meal-card"><div class="meal-image">${photo(d)}<button class="icon-btn favorite-btn ${s.favorites.includes(d.id)?'selected':''}" data-favorite="${d.id}" aria-label="${s.favorites.includes(d.id)?'Bỏ yêu thích':'Lưu yêu thích'} ${esc(d.name)}" aria-pressed="${s.favorites.includes(d.id)}">${icon('heart')}</button></div><div class="meal-body"><small>${['Bữa sáng','Bữa trưa','Bữa tối'][i]}</small><h2>${esc(d.name)}</h2><div class="meal-meta"><strong class="number">${money(d.cost)}</strong><span>${d.time} phút · 1 người</span></div>${badge(esc(d.tag))}<p class="ingredients-list mt">${Object.entries(d.needs).map(([k,q])=>esc(Demo.ingredients[k].name)+' '+qty(q,Demo.ingredients[k].unit)).join(' · ')}</p><div class="actions"><button class="btn" data-swap="${i}" ${disabled(s.checkedOut)}>${icon('swap')} Đổi món khác</button><button class="btn subtle" data-recipe="${d.id}">Cách nấu</button></div></div></article>`).join('')}</div><p class="caption">Ảnh món ăn mang tính minh họa. Chi phí khẩu phần là giá mẫu; tiền mua theo gói có thể khác và được ghi riêng ở mục Đi chợ.</p><div class="panel menu-summary"><div><small>Tổng dự chi cho ${s.meals} bữa</small><div><strong class="number">${money(b.estimated)}</strong> <small>/ ${money(s.checkedOut?s.logs.find(l=>l.day===s.day).planned:b.allowance)} ${s.checkedOut?'dự chi đã ghi':'định mức ngày'}</small></div></div><button class="btn primary" data-action="confirm-menu" ${disabled(s.checkedOut||b.estimated>b.allowance)}>${icon(s.confirmed?'cart':'check')} ${s.checkedOut?'Đã cập nhật mua sắm':s.confirmed?'Xem danh sách đi chợ':'Xác nhận thực đơn hôm nay'}</button></div>${!s.checkedOut&&b.estimated>b.allowance?'<div class="hint warn mt">Dự chi vượt định mức. Đổi sang món ít tốn hơn hoặc điều chỉnh kế hoạch.</div>':''}`;}
+  function setup(){
+    const s=A.state,b=Demo.summary(s);
+    const budgetVal = s.budget === 500000 ? 300000 : s.budget;
+    const daysVal = s.days === 10 ? 7 : s.days;
+    const mealsVal = s.meals || 4;
+    const nutritionVal = s.nutrition || 'Tiết kiệm';
+    const prefsList = ['Nhiều rau','Nhiều đạm','Ít cay','Không hải sản','Không thịt bò','Không thịt heo','Không thịt gà','Ăn chay'];
+    const curPrefs = s.preferences && s.preferences.length ? s.preferences : ['Nhiều rau','Ăn chay','Không thịt bò'];
+    return title('Bắt đầu lập kế hoạch','Nhập thông tin kế hoạch ăn uống để hệ thống gợi ý thực đơn, định mức chi phí và hỗ trợ tự đề xuất ý tưởng.')+`
+    <div class="setup-grid">
+      <form class="panel setup-plan-card" id="plan-form">
+        <section class="form-section">
+          <h2>Thông tin kế hoạch ăn uống</h2>
+          <p class="mt form-hint">Hệ thống sẽ dựa trên ngân sách, số bữa và sở thích ăn uống để xây dựng thực đơn từng ngày phù hợp nhất.</p>
+          <div class="form-grid two-cols">
+            <label class="field">
+              <span>Ngân sách cả kỳ (đồng)</span>
+              <input name="budget" id="plan-budget" type="number" min="40000" max="100000000" step="1000" required value="${budgetVal}" placeholder="300000">
+            </label>
+            <label class="field">
+              <span>Số ngày lập kế hoạch</span>
+              <input name="days" id="plan-days" type="number" min="1" max="365" step="1" required value="${daysVal}" placeholder="7">
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <label class="pill-title">Số bữa ăn mỗi ngày</label>
+          <div class="pill-group" role="radiogroup" aria-label="Số bữa ăn mỗi ngày">
+            ${[2,3,4].map(n=>`
+              <label class="pill-chip ${mealsVal===n?'active':''}">
+                <input type="radio" name="meals" value="${n}" ${mealsVal===n?'checked':''}>
+                <span>${n} bữa</span>
+              </label>
+            `).join('')}
+          </div>
+        </section>
+
+        <section class="form-section">
+          <label class="pill-title">Mức dinh dưỡng mong muốn</label>
+          <div class="pill-group" role="radiogroup" aria-label="Mức dinh dưỡng mong muốn">
+            ${['Tiết kiệm','Cân bằng','Nhiều đạm'].map(nut=>`
+              <label class="pill-chip ${nutritionVal===nut?'active':''}">
+                <input type="radio" name="nutrition" value="${nut}" ${nutritionVal===nut?'checked':''}>
+                <span>${nut}</span>
+              </label>
+            `).join('')}
+          </div>
+        </section>
+
+        <section class="form-section">
+          <label class="pill-title">Sở thích và món không ăn (chọn nhiều)</label>
+          <div class="pill-group wrap" aria-label="Sở thích và món không ăn">
+            ${prefsList.map(p=>`
+              <label class="pill-chip ${curPrefs.includes(p)?'active':''}">
+                <input type="checkbox" name="preference" value="${p}" ${curPrefs.includes(p)?'checked':''}>
+                <span>${p}</span>
+              </label>
+            `).join('')}
+          </div>
+        </section>
+
+        <section class="form-section setup-actions">
+          <div class="actions">
+            <button class="btn primary btn-start-plan" type="submit" name="mode" value="new">${icon('plus')} Bắt đầu lập kế hoạch</button>
+            <button class="btn" type="submit" name="mode" value="edit">Cập nhật kế hoạch</button>
+          </div>
+          <p class="form-error" id="plan-error" role="alert"></p>
+        </section>
+      </form>
+
+      <aside class="stack" style="align-content:start">
+        <section class="panel plan-quickview-card">
+          <h2>Kế hoạch nhìn nhanh</h2>
+          <div class="summary-line"><span>Ngân sách cả kỳ</span><strong class="number" id="preview-budget">${money(budgetVal)}</strong></div>
+          <div class="summary-line"><span>Thời gian</span><strong id="preview-days">${daysVal} ngày</strong></div>
+          <div class="summary-line"><span>Số bữa mỗi ngày</span><strong id="preview-meals">${mealsVal} bữa</strong></div>
+          <div class="summary-line"><span>Mức dinh dưỡng</span><strong id="preview-nutrition">${nutritionVal}</strong></div>
+          <div class="summary-total"><small>Ngân sách trung bình mỗi ngày</small><strong class="number" id="preview-allowance">${money(Math.floor(budgetVal/daysVal))}<small>/ ngày</small></strong></div>
+          <button type="button" class="btn full" id="calculate-budget">Tính định mức dự kiến</button>
+        </section>
+        <div class="hint">Phạm vi hỗ trợ từ 40.000đ/ngày. Đầy đủ tính năng gợi ý món ăn theo ngày và hỗ trợ thành viên tự đề xuất ý tưởng thực đơn riêng.</div>
+      </aside>
+    </div>`;
+  }
+  function menu(){return A.renderMenu();}
   function shopping(){const s=A.state,list=Demo.shopping(s),total=list.reduce((n,i)=>n+i.cost,0);const area=s.area.includes('Thủ')?'Thủ Đức':'Nguyễn Văn Cừ';return title('Đi chợ có danh sách, chi tiêu có kế hoạch.','Lượng cần mua = lượng cần cho món − lượng còn dùng được trong tủ lạnh.')+`${!s.confirmed?`<div class="hint warn status-banner">Bạn đang xem danh sách tạm. <button class="text-btn" data-go="menu">Xác nhận thực đơn</button> trước khi cập nhật mua sắm.</div>`:''}${s.checkedOut?'<div class="hint status-banner">Ngày này đã cập nhật. Tồn kho hiển thị phần còn lại sau khi dùng cho thực đơn; danh sách phía dưới được tính lại từ kho hiện tại, không phải hóa đơn đã mua.</div>':''}<section class="panel"><div class="panel-head"><div><h2>Danh sách nguyên liệu</h2><p>Đã trừ đồ còn hạn · Đơn vị theo quy cách mua mẫu</p></div><div class="actions"><button class="btn small" id="copy-shopping">${icon('copy')} Copy</button><button class="btn small" id="download-shopping">${icon('download')} Tải .txt</button></div></div><div class="table-wrap"><table class="shopping-table"><caption class="sr-only">Danh sách nguyên liệu và lượng thực tế mua</caption><thead><tr><th>Nguyên liệu</th><th>Cần dùng</th><th>Có thể dùng</th><th>Cần mua thêm</th><th>Gói mua mẫu</th><th>Giá mẫu</th><th>Lượng mua thực tế</th></tr></thead><tbody>${list.map(i=>`<tr><td><label class="row"><input class="shopping-check" type="checkbox" aria-label="Đã chọn mua ${esc(i.name)}"><strong>${esc(i.name)}</strong></label></td><td>${qty(i.need,i.unit)}</td><td>${qty(i.have,i.unit)}</td><td class="green">${qty(i.buy,i.unit)}</td><td>${i.packs} × ${qty(i.pack,i.unit)}</td><td class="number">${money(i.cost)}</td><td><label><span class="sr-only">Lượng mua ${esc(i.name)} (${esc(i.unit)})</span><input form="checkout-form" class="quantity-input" name="qty-${i.key}" type="number" min="${i.buy}" max="1000000" step="1" value="${i.bought}" ${disabled(s.checkedOut)} required> <small>${i.unit}</small></label></td></tr>`).join('')}</tbody></table></div><div class="row between wrap mt"><small>Giá theo gói tham khảo minh họa; không phải giá khảo sát.</small><strong class="green number">Tổng giá mẫu: ${money(total)}</strong></div></section><div class="shopping-bottom section-space"><section class="panel"><div class="panel-head"><div><h2>Chọn nơi mua</h2><p>Khu vực mẫu: ${esc(area)} · Phạm vi dưới 5km</p></div>${icon('pin')}</div><div class="stores">${[['Chợ gần trường',total,1.2],['Bách Hóa Xanh',Math.round(total*1.08/1000)*1000,2.1],['WinMart+',Math.round(total*1.13/1000)*1000,2.8]].map(([name,price,dist],i)=>`<label class="store-option"><input type="radio" name="store" value="${price}" ${i===0?'checked':''} ${disabled(s.checkedOut)}><span><strong>${name}</strong><small>${dist}km · Điểm bán minh họa</small></span><strong class="price number">${money(price)}</strong></label>`).join('')}</div><p class="caption">Tên chuỗi để minh họa so sánh, không xác nhận chi nhánh hoặc khoảng cách thực. Chọn cửa hàng sẽ điền giá mẫu, bạn có thể sửa tiền thực chi.</p></section><section class="panel"><h2>Cập nhật sau mua sắm</h2><p style="font-size:12px;margin:8px 0 20px">Nhập lượng mua ở bảng phía trên và tổng tiền thực tế.</p><form id="checkout-form"><label class="field">Tổng tiền thực chi (VNĐ)<input type="number" name="actual" id="actual-spent" min="0" step="1" max="${Demo.summary(s).remaining}" value="${s.checkedOut?s.logs.find(l=>l.day===s.day).actual:total}" required ${disabled(s.checkedOut)}></label><p class="caption">Cập nhật đồng thời tiền đã chi và phần nguyên liệu dư sau bữa ăn mẫu.</p><p class="form-error" id="checkout-error" role="alert"></p><button class="btn primary full" ${disabled(s.checkedOut||!s.confirmed)}>${icon('check')} ${s.checkedOut?'Đã cập nhật hôm nay':'Cập nhật sau khi mua sắm'}</button></form></section></div>`;}
   function fridge(){const s=A.state,items=s.fridge.filter(i=>A.filter==='all'||(A.filter==='expired'?i.expiry<s.day:A.filter==='expiring'?i.expiry>=s.day&&i.expiry<=s.day+1:i.expiry>s.day+1));return title('Tủ lạnh nhỏ, tận dụng hết.','Theo dõi những gì còn lại, ưu tiên nguyên liệu cần dùng sớm.',`<button class="btn primary" data-action="add-ingredient">${icon('plus')} Thêm nguyên liệu</button>`)+`<div class="filter-row" aria-label="Lọc hạn sử dụng">${[['all','Tất cả'],['fresh','Còn mới'],['expiring','Sắp hết hạn'],['expired','Đã hết hạn']].map(([id,t])=>`<button class="filter-btn ${A.filter===id?'active':''}" data-filter="${id}" aria-pressed="${A.filter===id}">${t}${id==='all'?' ('+s.fridge.length+')':''}</button>`).join('')}</div>${items.length?`<div class="inventory-grid">${items.map(i=>{const info=Demo.ingredients[i.key],[label,type]=expiry(i);return `<article class="panel inventory-item"><div class="row"><span class="ingredient-symbol ${type}">${icon(ingredientIcon(i.key))}</span><h3>${esc(info.name)}</h3></div><div class="inventory-quantity number">${qty(i.qty,info.unit)}</div>${badge(label,type)}<p class="expiry">Hạn mẫu: hết ngày ${i.expiry} của kế hoạch</p><button class="text-btn ${type==='danger'?'danger':''}" data-remove="${esc(i.id)}">${icon('trash')} ${type==='danger'?'Loại bỏ nguyên liệu':'Báo đã dùng hết'}</button></article>`;}).join('')}</div>`:`<div class="panel empty">${icon('fridge')}<h2>${s.fridge.length?'Không có nguyên liệu ở bộ lọc này.':'Tủ lạnh đang trống.'}</h2><p>Thêm đồ bạn đang có hoặc cập nhật sau khi mua sắm.</p></div>`}<div class="inventory-bottom"><p style="font-size:12px">Hạn dùng là mốc mô phỏng theo ngày kế hoạch, không phải hướng dẫn bảo quản thực phẩm.</p><button class="btn primary" data-action="advance" ${disabled(!s.checkedOut||s.day>=s.days)}>Kết thúc ngày & tiếp tục ${icon('arrow')}</button></div>${!s.checkedOut?'<p class="caption">Cập nhật mua sắm và tiền thực chi trước khi chuyển ngày.</p>':''}`;}
   function history(){const s=A.state,logs=s.logs,b=Demo.summary(s),planned=logs.reduce((n,l)=>n+l.planned,0),difference=planned-b.spent,max=Math.max(1,...logs.flatMap(l=>[l.planned,l.actual]));return title('Nhìn lại từng bữa, từng khoản chi.','Dữ liệu của kỳ kế hoạch đang mở trên trình duyệt.',`<label class="field"><span class="sr-only">Kỳ kế hoạch</span><select id="history-period"><option value="current">Kỳ hiện tại · ${s.days} ngày</option><option value="example">Xem kỳ mẫu trước</option></select></label>`)+`<div id="history-data"><div class="history-stats"><div><small>Tổng tiền thực chi</small><strong class="number">${money(b.spent)}</strong></div><div><small>Dự chi − thực chi</small><strong class="number ${difference>=0?'green':''}">${money(difference)}</strong></div><div><small>Số ngày đã ghi nhận</small><strong class="number">${logs.length} <small>/ ${s.days} ngày</small></strong></div></div>${logs.length?`<section class="panel"><div class="panel-head"><h2>Dự chi & thực tế</h2><div class="chart-legend"><span><i class="plan"></i>Dự chi</span><span><i></i>Thực chi</span></div></div><div class="table-wrap"><div class="chart" role="img" aria-label="Biểu đồ dự chi và thực chi, số liệu chi tiết ở bảng dưới" style="min-width:${Math.max(260,logs.length*80)}px">${logs.map(l=>`<div class="chart-column"><span class="chart-values">${Math.round(l.planned/1000)}k / ${Math.round(l.actual/1000)}k</span><div class="chart-bars"><div class="bar-plan" style="height:${l.planned/max*100}%"></div><div class="bar-actual" style="height:${l.actual/max*100}%"></div></div><small>Ngày ${l.day}</small></div>`).join('')}</div></div></section><section class="panel section-space"><div class="panel-head"><h2>Nhật ký bữa ăn</h2><small>Chọn một ngày để xem món</small></div><div class="table-wrap"><table><thead><tr><th>Ngày</th><th>Dự chi</th><th>Thực chi</th><th>Chênh lệch</th><th>Chi tiết</th></tr></thead><tbody>${logs.map(l=>`<tr><td>Ngày ${l.day}</td><td class="number">${money(l.planned)}</td><td class="number">${money(l.actual)}</td><td class="number ${l.planned>=l.actual?'green':''}">${money(l.planned-l.actual)}</td><td><button class="text-btn" data-log="${l.day}" style="font-size:12px">Xem bữa ăn ${icon('arrow')}</button></td></tr>`).join('')}</tbody></table></div></section>`:`<div class="panel empty">${icon('chart')}<h2>Chưa có ngày nào được ghi lại.</h2><p>Cập nhật thực chi sau chuyến đi chợ đầu tiên để xem thống kê.</p><button class="btn mt" data-go="shopping">Mở danh sách đi chợ</button></div>`}</div><p class="caption">Chênh lệch dương là chi ít hơn dự kiến; chênh lệch âm có thể xuất hiện khi mua theo gói để dùng nhiều ngày.</p>`;}
-  function bindSetup(){const form=$('#plan-form');const preview=()=>{const f=new FormData(form),n=Number(f.get('budget')),x=Number(f.get('days'));$('#preview-budget').textContent=Number.isFinite(n)?money(n):'—';$('#preview-days').textContent=x+' ngày';$('#preview-allowance').textContent=x>0&&Number.isFinite(n)?money(Math.floor(n/x))+' / ngày':'Nhập số ngày hợp lệ';};form.oninput=preview;$('#calculate-budget').onclick=()=>{preview();A.toast('Đã tính định mức trung bình. Kế hoạch chỉ thay đổi khi bạn bấm Tạo hoặc Chỉnh sửa.');};form.onsubmit=async e=>{e.preventDefault();const f=new FormData(form),n=Number(f.get('budget')),x=Number(f.get('days')),m=Number(f.get('meals')),mode=e.submitter?.value||'new';try{const fresh=Demo.newPlan(n,x,m);Object.assign(fresh,{name:A.state.name,theme:A.state.theme,unit:A.state.unit,reminders:A.state.reminders,preferences:f.getAll('preference'),area:f.get('area')});if(mode==='new'){if(!(await A.confirm('Tạo kế hoạch mới?','Lịch sử và tủ lạnh hiện tại sẽ được đặt lại. Bạn có thể khôi phục dữ liệu mẫu trong Cài đặt.')))return;adaptMenu(fresh);A.state=fresh;}else{const s=A.state;if(x<s.day||n<Demo.summary(s).spent)throw Error('Số ngày không được nhỏ hơn ngày hiện tại, ngân sách không được nhỏ hơn số tiền đã chi.');if(s.checkedOut&&(m!==s.meals||JSON.stringify(fresh.preferences)!==JSON.stringify(s.preferences)))throw Error('Ngày này đã cập nhật. Chuyển sang ngày tiếp theo để đổi số bữa hoặc lựa chọn thực phẩm.');Object.assign(s,{budget:n,days:x,meals:m,preferences:fresh.preferences,area:fresh.area});if(!s.checkedOut){s.confirmed=false;adaptMenu(s);}}A.save();A.go('overview');A.toast(mode==='new'?'Đã tạo kế hoạch demo mới.':'Đã chỉnh sửa kế hoạch.');}catch(err){$('#plan-error').textContent=err.message;}};}
+  function bindSetup(){
+    const form=$('#plan-form');
+    if(!form) return;
+    const preview=()=>{
+      const f=new FormData(form);
+      const n=Number(f.get('budget')), x=Number(f.get('days')), m=Number(f.get('meals')), nut=f.get('nutrition')||'Tiết kiệm';
+      $('#preview-budget').textContent=Number.isFinite(n)?money(n):'—';
+      $('#preview-days').textContent=x>0?x+' ngày':'—';
+      $('#preview-meals').textContent=m>0?m+' bữa':'—';
+      $('#preview-nutrition').textContent=nut;
+      $('#preview-allowance').textContent=x>0&&Number.isFinite(n)?money(Math.floor(n/x))+' / ngày':'Nhập số ngày hợp lệ';
+    };
+    form.oninput=preview;
+    form.querySelectorAll('.pill-chip input').forEach(inp=>{
+      inp.onchange=()=>{
+        if(inp.type==='radio'){
+          form.querySelectorAll(`input[name="${inp.name}"]`).forEach(r=>{
+            r.closest('.pill-chip').classList.toggle('active', r.checked);
+          });
+        } else {
+          inp.closest('.pill-chip').classList.toggle('active', inp.checked);
+        }
+        preview();
+      };
+    });
+    const calcBtn=$('#calculate-budget');
+    if(calcBtn) calcBtn.onclick=()=>{preview();A.toast('Đã tính định mức trung bình: '+$('#preview-allowance').textContent);};
+    form.onsubmit=async e=>{
+      e.preventDefault();
+      const f=new FormData(form);
+      const n=Number(f.get('budget')), x=Number(f.get('days')), m=Number(f.get('meals'))||4, nut=f.get('nutrition')||'Tiết kiệm';
+      const prefs=f.getAll('preference');
+      const mode=e.submitter?.value||'new';
+      try{
+        const fresh=Demo.newPlan(n,x,m,nut,prefs);
+        Object.assign(fresh,{
+          name:A.state.name,
+          theme:A.state.theme,
+          unit:A.state.unit,
+          reminders:A.state.reminders,
+          area:A.state.area
+        });
+        Demo.generateMultiDayPlan(fresh);
+        if(mode==='new'){
+          A.state=fresh;
+        }else{
+          const s=A.state;
+          if(x<s.day||n<Demo.summary(s).spent)throw Error('Số ngày không được nhỏ hơn ngày hiện tại, ngân sách không được nhỏ hơn số tiền đã chi.');
+          Object.assign(s,{budget:n,days:x,meals:m,nutrition:nut,preferences:prefs});
+          Demo.generateMultiDayPlan(s);
+        }
+        A.save();
+        A.go('menu');
+        A.toast('Đã thiết lập kế hoạch thành công! Đang hiển thị thực đơn theo ngày.');
+      }catch(err){
+        const errEl=$('#plan-error');
+        if(errEl) errEl.textContent=err.message;
+        else A.toast(err.message);
+      }
+    };
+  }
   const shoppingText=()=>{const s=A.state;return 'BẾP SINH VIÊN — DANH SÁCH ĐI CHỢ MẪU\nNgày '+s.day+' / '+s.days+'\n'+Demo.shopping(s).map(i=>'[ ] '+i.name+': cần thêm '+qty(i.buy,i.unit)+'; mua mẫu '+qty(i.bought,i.unit)+' — '+money(i.cost)).join('\n')+'\nGiá minh họa. Hãy kiểm tra giá và hạn dùng thực tế.';};
   function bindShopping(){document.querySelectorAll('input[name=store]').forEach(r=>r.onchange=()=>{$('#actual-spent').value=r.value;});$('#download-shopping').onclick=()=>A.download('danh-sach-di-cho.txt',shoppingText());$('#copy-shopping').onclick=async()=>{try{await navigator.clipboard.writeText(shoppingText());A.toast('Đã copy danh sách đi chợ.');}catch{A.openDrawer('Copy danh sách đi chợ',`<p>Trình duyệt chưa cho phép copy tự động. Chọn và sao chép nội dung dưới đây.</p><label class="field">Danh sách<textarea id="copy-fallback" rows="12" readonly>${esc(shoppingText())}</textarea></label>`);$('#copy-fallback').select();}};$('#checkout-form').onsubmit=e=>{e.preventDefault();try{const f=new FormData(e.target),quantities={};Demo.shopping(A.state).forEach(i=>quantities[i.key]=Number(f.get('qty-'+i.key)));Demo.checkout(A.state,Number(f.get('actual')),quantities);A.save();A.render();A.toast('Đã ghi thực chi và giữ nguyên liệu dư trong tủ lạnh.');}catch(err){$('#checkout-error').textContent=err.message;}};}
   async function advance(){const s=A.state;if(!s.checkedOut)return A.toast('Cập nhật mua sắm và tiền thực chi trước khi chuyển ngày.');if(s.day>=s.days)return A.go('history');if(await A.confirm('Kết thúc ngày '+s.day+'?','Tiếp tục sang ngày '+(s.day+1)+'. Hạn nguyên liệu và định mức ngân sách sẽ được tính lại trong kịch bản demo.')){try{Demo.advance(s);A.save();A.go('overview');A.toast('Chào ngày '+s.day+'! Định mức và hạn dùng đã cập nhật.');}catch(e){A.toast(e.message);}}}
   function addIngredient(){A.openDrawer('Thêm vào tủ lạnh',`<form id="ingredient-form"><label class="field">Nguyên liệu<select name="key" id="ingredient-select">${Object.entries(Demo.ingredients).map(([k,i])=>`<option value="${k}">${esc(i.name)} (${i.unit})</option>`).join('')}</select></label><label class="field">Số lượng (<span id="ingredient-unit">g</span>)<input name="qty" type="number" min="1" max="1000000" step="1" required value="100"></label><label class="field">Còn sử dụng được trong bao nhiêu ngày?<input name="life" type="number" min="1" max="365" step="1" required value="3"><small>Ví dụ: nhập 1 để đánh dấu dùng trong hôm nay. Mốc do bạn nhập, không phải khuyến nghị bảo quản.</small></label><button class="btn primary">${icon('plus')} Thêm nguyên liệu</button></form>`);$('#ingredient-select').onchange=e=>{$('#ingredient-unit').textContent=Demo.ingredients[e.target.value].unit;};$('#ingredient-form').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),key=f.get('key'),quantity=Number(f.get('qty')),life=Number(f.get('life'));if(!Demo.ingredients[key]||!Number.isInteger(quantity)||quantity<1||quantity>1000000||!Number.isInteger(life)||life<1||life>365)return A.toast('Nhập số lượng và hạn dùng nguyên hợp lệ.');A.state.fridge.push({id:'manual-'+Date.now(),key,qty:quantity,expiry:A.state.day+life-1});A.save();A.filter='all';A.closeDrawer();A.go('fridge');A.toast('Đã thêm nguyên liệu vào tủ lạnh mẫu.');};}
   document.addEventListener('click',async e=>{
-    const action=e.target.closest('[data-action]')?.dataset.action;if(action==='advance')advance();if(action==='add-ingredient')addIngredient();if(action==='confirm-menu'){if(A.state.confirmed)return A.go('shopping');if(Demo.summary(A.state).estimated>Demo.summary(A.state).allowance)return A.toast('Dự chi vượt định mức. Hãy đổi món hoặc sửa kế hoạch.');A.state.confirmed=true;A.save();A.go('shopping');A.toast('Đã chốt thực đơn. Danh sách đi chợ đã sẵn sàng.');}
+    const action=e.target.closest('[data-action]')?.dataset.action;if(action==='advance')advance();if(action==='add-ingredient')addIngredient();if(action==='confirm-menu'){if(A.state.checkedOut)return;if(!Demo.menuReady(A.state))return A.toast('Hãy chọn đủ món phù hợp cho các bữa trước khi xác nhận.');if(A.state.confirmed)return A.go('shopping');if(Demo.summary(A.state).estimated>Demo.summary(A.state).allowance)return A.toast('Dự chi vượt định mức. Hãy đổi món hoặc sửa kế hoạch.');A.state.confirmed=true;A.save();A.go('shopping');A.toast('Đã chốt thực đơn. Danh sách đi chợ đã sẵn sàng.');}
     const fav=e.target.closest('[data-favorite]');if(fav){const id=fav.dataset.favorite,s=A.state;if(s.favorites.includes(id))s.favorites=s.favorites.filter(f=>f!==id);else s.favorites.push(id);A.save();A.render();A.toast(s.favorites.includes(id)?'Đã lưu món yêu thích.':'Đã bỏ yêu thích.');}
-    const swap=e.target.closest('[data-swap]');if(swap){const s=A.state;if(s.checkedOut)return;const idx=Number(swap.dataset.swap),old=s.selected[idx],pool=Demo.dishes.filter(d=>allowed(d,s)&&(idx===0?['bread','tofusandwich'].includes(d.id):!['bread','tofusandwich'].includes(d.id)));if(pool.length<2)return A.toast('Chỉ có một món mẫu phù hợp lựa chọn này.');s.selected[idx]=pool[(pool.findIndex(d=>d.id===old)+1)%pool.length].id;s.confirmed=false;A.save();A.render();A.toast('Đã đổi món. Hãy xác nhận lại thực đơn.');}
-    const recipe=e.target.closest('[data-recipe]');if(recipe){const d=Demo.dish(recipe.dataset.recipe);A.openDrawer(d.name,`${photo(d,'recipe-image')}<div class="actions">${badge(d.time+' phút')}${badge('1 khẩu phần mẫu')}${badge(money(d.cost))}</div><h3>Nguyên liệu</h3><p>${Object.entries(d.needs).map(([k,q])=>esc(Demo.ingredients[k].name)+' '+qty(q,Demo.ingredients[k].unit)).join(' · ')}</p><h3>Cách chuẩn bị mẫu</h3><p class="recipe-steps">${esc(d.recipe)}</p><small>Ảnh minh họa. Công thức và định lượng sẽ được hoàn thiện khi bổ sung dữ liệu món ăn chính thức.</small>`);}
+    const swap=e.target.closest('[data-swap]');if(swap){const s=A.state;if(s.checkedOut)return;const idx=Number(swap.dataset.swap),old=s.selected[idx],pool=Demo.dishes.filter(d=>allowed(d,s)&&(idx===0?['bread','tofusandwich','eggfriedtomato','eggporridge'].includes(d.id):!['bread','tofusandwich'].includes(d.id)));if(pool.length<2)return A.toast('Chỉ có một món mẫu phù hợp lựa chọn này.');s.selected[idx]=pool[(pool.findIndex(d=>d.id===old)+1)%pool.length].id;s.confirmed=false;if(!s.dailyMenus)s.dailyMenus={};s.dailyMenus[s.day]=[...s.selected];A.save();A.render();A.toast('Đã đổi món. Hãy xác nhận lại thực đơn.');}
+    const recipe=e.target.closest('[data-recipe]');if(recipe){const d=Demo.dish(recipe.dataset.recipe);A.openDrawer(d.name,`${photo(d,'recipe-image')}<div class="actions">${badge(d.time+' phút')}${badge('1 khẩu phần mẫu')}${badge(money(d.cost))}</div><h3>Nguyên liệu</h3><p>${Object.entries(d.needs).map(([k,q])=>esc(Demo.ingredients[k]?Demo.ingredients[k].name:k)+' '+qty(q,(Demo.ingredients[k]?Demo.ingredients[k].unit:'g'))).join(' · ')}</p><h3>Cách chuẩn bị mẫu</h3><p class="recipe-steps">${esc(d.recipe)}</p><small>Ảnh minh họa. Công thức và định lượng sẽ được hoàn thiện khi bổ sung dữ liệu món ăn chính thức.</small>`);}
     const filter=e.target.closest('[data-filter]');if(filter){A.filter=filter.dataset.filter;A.render();}
     const remove=e.target.closest('[data-remove]');if(remove){const i=A.state.fridge.find(i=>i.id===remove.dataset.remove);if(i&&await A.confirm('Loại '+Demo.ingredients[i.key].name+' khỏi tủ lạnh?','Lượng nguyên liệu này sẽ không còn được trừ khi tính danh sách cần mua.')){A.state.fridge=A.state.fridge.filter(f=>f.id!==i.id);A.save();A.render();A.toast('Đã cập nhật tủ lạnh.');}}
-    const log=e.target.closest('[data-log]');if(log){const l=A.state.logs.find(l=>l.day===Number(log.dataset.log));A.openDrawer('Bữa ăn ngày '+l.day,`<div class="summary-line"><span>Thực chi</span><strong class="number">${money(l.actual)}</strong></div>${l.names.map((n,i)=>`<div class="summary-line"><span>${['Bữa sáng','Bữa trưa','Bữa tối'][i]}</span><strong>${esc(n)}</strong></div>`).join('')}<small>Nhật ký của dữ liệu demo.</small>`);}
+    const log=e.target.closest('[data-log]');if(log){const l=A.state.logs.find(l=>l.day===Number(log.dataset.log));A.openDrawer('Bữa ăn ngày '+l.day,`<div class="summary-line"><span>Thực chi</span><strong class="number">${money(l.actual)}</strong></div>${l.names.map((n,i)=>`<div class="summary-line"><span>${['Bữa sáng','Bữa trưa','Bữa xế','Bữa tối'][(l.mealSlots||[0,1,2,3])[i]||i]||'Bữa ăn'}</span><strong>${esc(n)}</strong></div>`).join('')}<small>Nhật ký của dữ liệu demo.</small>`);}
   });
   document.addEventListener('change',e=>{if(e.target.id==='history-period'){if(e.target.value==='example')A.openDrawer('Kỳ trước · Ví dụ minh họa',`<h3>Kế hoạch 5 ngày / 250.000đ</h3><div class="summary-line"><span>Chi tiêu mẫu</span><strong>231.000đ</strong></div><div class="summary-line"><span>Còn lại</span><strong class="green">19.000đ</strong></div><p>Đây là một kỳ ví dụ cố định để trình bày bộ lọc. Không được cộng vào kế hoạch hiện tại.</p>`);e.target.value='current';}});
 })();

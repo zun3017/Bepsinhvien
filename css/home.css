@@ -71,9 +71,6 @@
 .ring-legend button>span { display:flex; align-items:center; gap:9px; }
 .ring-legend i { width:10px; height:10px; border-radius:50%; background:var(--ring-color); flex-shrink:0; }
 .ring-legend strong { font-size:13px; font-variant-numeric:tabular-nums; }
-.pointer-glint { position:relative; }
-.pointer-glint:before { content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:radial-gradient(240px circle at var(--pointer-x,50%) var(--pointer-y,50%),#a9c99c30,transparent 70%); opacity:0; transition:opacity .25s ease-out; }
-.pointer-glint.is-pointer-active:before { opacity:1; }
 .premium-list { gap:10px; }
 .premium-list li { display:block; }
 .premium-feature { display:flex; align-items:flex-start; gap:13px; width:100%; min-height:74px; padding:14px; margin-left:-14px; background:transparent; border:1px solid transparent; border-radius:12px; color:inherit; text-align:left; }
@@ -81,7 +78,6 @@
 .premium-feature[aria-pressed=true] { background:#ffffff0b; border-color:#d9c69a66; }
 .premium-feature .icon { flex-shrink:0; transition:color .2s ease-out; }
 .premium-feature:hover .icon { color:#fff0cc; }
-.home-premium.pointer-glint:before { background:radial-gradient(420px circle at var(--pointer-x,50%) var(--pointer-y,50%),#b4d9bd22,transparent 75%); }
 .premium-chat-preview { background:#fffdf4; color:#294634; padding:26px; border-radius:14px; box-shadow:0 14px 28px #00000026; }
 .premium-chat-title { display:flex; gap:12px; align-items:center; padding-bottom:20px; border-bottom:1px solid #dce4d5; }
 .premium-chat-title .icon { color:#286342; width:26px; height:26px; }
@@ -142,4 +138,4 @@
 .motion-paused .pointer-tilt { transform:rotate(var(--tilt-base,0deg)); }
 .motion-paused .donut-segment,.motion-paused .home-bar-pair>span { animation:none!important; }
 @media(max-width:600px) { .motion-toggle { right:12px; bottom:12px; padding:9px 13px; font-size:11px; }.home-footer { padding-bottom:78px; } }
-@media(prefers-reduced-motion:reduce) { .home-page *, .home-page *::before, .home-page *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }.scroll-reveal { opacity:1; transform:none; translate:none; scale:1; filter:none; }.pointer-glint:before { display:none; } }
+@media(prefers-reduced-motion:reduce) { .home-page *, .home-page *::before, .home-page *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }.scroll-reveal { opacity:1; transform:none; translate:none; scale:1; filter:none; } }
