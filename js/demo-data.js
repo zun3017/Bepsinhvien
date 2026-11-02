@@ -71,6 +71,12 @@
       s.dailyMenus[dayNum][slot].push(dishId);
     }
     if (dayNum === s.day) {
+      if (!s.selected[slot] || s.selected[slot] === '') {
+        s.selected[slot] = dishId;
+      }
+      if (s.unfilled) {
+        s.unfilled = s.unfilled.filter(i => i !== slot);
+      }
       s.confirmed = false;
     }
   }
@@ -80,12 +86,16 @@
       s.dailyMenus[dayNum][slot] = [s.dailyMenus[dayNum][slot]];
     }
     s.dailyMenus[dayNum][slot] = s.dailyMenus[dayNum][slot].filter(id => id !== dishId);
-    if (dayNum === s.day) {
-      if (s.dailyMenus[dayNum][slot].length > 0) {
-        s.selected[slot] = s.dailyMenus[dayNum][slot][0];
+    if (s.dailyMenus[dayNum][slot].length > 0) {
+      if (dayNum === s.day) s.selected[slot] = s.dailyMenus[dayNum][slot][0];
+    } else {
+      if (dayNum === s.day) {
+        s.selected[slot] = '';
+        if (!s.unfilled) s.unfilled = [];
+        if (!s.unfilled.includes(slot)) s.unfilled.push(slot);
       }
-      s.confirmed = false;
     }
+    if (dayNum === s.day) s.confirmed = false;
   }
   function replaceDishInMeal(s, dayNum, slot, oldDishId, newDishId) {
     if (!s.dailyMenus) s.dailyMenus = {};

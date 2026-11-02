@@ -766,6 +766,45 @@
   font-size: 12px;
   min-height: 44px;
 }
+.btn-dish-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.btn-dish-toggle.is-added {
+  background: #eaf5ed !important;
+  color: #1b6342 !important;
+  border: 1.5px solid #a3d4b2 !important;
+  font-weight: 600;
+}
+.btn-dish-toggle.is-added .state-hover {
+  display: none;
+}
+.btn-dish-toggle.is-added .state-default {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-dish-toggle.is-added:hover {
+  background: #fde8e8 !important;
+  color: #b71c1c !important;
+  border-color: #f5b7b7 !important;
+}
+.btn-dish-toggle.is-added:hover .state-default {
+  display: none;
+}
+.btn-dish-toggle.is-added:hover .state-hover {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-dish-toggle.is-added:hover .state-hover .icon {
+  width: 14px;
+  height: 14px;
+}
 .catalog-empty {
   text-align: center;
   padding: 44px 20px;

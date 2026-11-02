@@ -65,15 +65,21 @@
               ${availabilityBadge(s,d)}
               <div class="actions">
                 ${isAddingMode ? `
-                  <button class="btn small primary" data-add-to-meal="${d.id}" ${off(s)} ${alreadyInMeal?'disabled':''}>
-                    ${alreadyInMeal ? icon('check')+' Đã có trong bữa' : icon('plus')+' Thêm vào '+label.toLowerCase()}
+                  <button type="button" class="btn small btn-dish-toggle ${alreadyInMeal ? 'is-added' : 'primary'}" data-toggle-meal-dish="${d.id}" ${off(s)} title="${alreadyInMeal ? 'Bấm để hủy món này khỏi ' + label.toLowerCase() : 'Thêm vào ' + label.toLowerCase()}">
+                    ${alreadyInMeal ? `
+                      <span class="state-default">${icon('check')} Đã có trong bữa</span>
+                      <span class="state-hover">${icon('close')} Bấm để hủy</span>
+                    ` : icon('plus') + ' Thêm vào ' + label.toLowerCase()}
                   </button>
                 ` : `
-                  <button class="btn small ${alreadyInMeal?'':'primary'}" data-pick-dish="${d.id}" ${off(s)}>
+                  <button type="button" class="btn small ${alreadyInMeal?'':'primary'}" data-pick-dish="${d.id}" ${off(s)}>
                     ${alreadyInMeal ? icon('check')+' Đang chọn' : 'Đổi thành món này'}
                   </button>
-                  <button class="btn small" data-add-to-meal="${d.id}" ${off(s)} ${alreadyInMeal?'disabled':''}>
-                    ${icon('plus')} Thêm món này
+                  <button type="button" class="btn small btn-dish-toggle ${alreadyInMeal ? 'is-added' : ''}" data-toggle-meal-dish="${d.id}" ${off(s)} title="${alreadyInMeal ? 'Bấm để hủy món này khỏi ' + label.toLowerCase() : 'Thêm món này'}">
+                    ${alreadyInMeal ? `
+                      <span class="state-default">${icon('check')} Đã có trong bữa</span>
+                      <span class="state-hover">${icon('close')} Hủy món</span>
+                    ` : icon('plus') + ' Thêm món này'}
                   </button>
                 `}
                 <button class="text-btn small" data-recipe="${d.id}">Cách nấu</button>
@@ -226,9 +232,7 @@
                         <div class="subdish-controls">
                           <button class="btn small" data-edit-meal="${idx}" data-replace-target="${d.id}">${icon('swap')} Đổi món</button>
                           <button class="text-btn small" data-recipe="${d.id}">Cách nấu</button>
-                          ${dishesInMeal.length > 1 ? `
-                            <button class="text-btn small danger" data-remove-meal-dish="${d.id}" data-meal-slot="${idx}" title="Xóa món này khỏi bữa">✕ Xóa</button>
-                          ` : ''}
+                          <button class="text-btn small danger" data-remove-meal-dish="${d.id}" data-meal-slot="${idx}" title="Hủy món này khỏi bữa">✕ Hủy</button>
                         </div>
                       </article>
                     `;
@@ -398,27 +402,49 @@
       return;
     }
 
-    // Xóa một món khỏi bữa ăn
+    // Xóa một món khỏi bữa ăn (từ thẻ chi tiết món)
     const removeDish=e.target.closest('[data-remove-meal-dish]');
     if(removeDish){
       const dishId=removeDish.dataset.removeMealDish;
       const slot=Number(removeDish.dataset.mealSlot);
+      const dishObj=D.dish(dishId);
+      const dishName=dishObj ? dishObj.name : 'Món ăn';
+      const labels=getMealLabels(s.meals);
+      const mealName=labels[slot] ? labels[slot].toLowerCase() : 'bữa ăn';
+      const scrollY=window.scrollY;
       D.removeDishFromMeal(s, currentDay, slot, dishId);
       A.save();
       A.render();
-      A.toast('Đã xóa món khỏi bữa ăn.');
+      window.scrollTo(0, scrollY);
+      A.toast(`Đã hủy món "${dishName}" khỏi ${mealName}.`);
       return;
     }
 
-    // Thêm món vào bữa đang active
-    const addDish=e.target.closest('[data-add-to-meal]');
-    if(addDish){
-      const dishId=addDish.dataset.addToMeal;
-      D.addDishToMeal(s, currentDay, active, dishId);
-      A.save();
-      A.render();
+    // Toggle (Thêm hoặc Hủy) món vào bữa đang active từ danh mục món
+    const toggleDish=e.target.closest('[data-toggle-meal-dish], [data-add-to-meal]');
+    if(toggleDish){
+      const dishId=toggleDish.dataset.toggleMealDish || toggleDish.dataset.addToMeal;
+      const dayDishes=D.getDayMealDishes(s, currentDay, active);
+      const dayDishIds=dayDishes.map(d=>d.id);
       const labels=getMealLabels(s.meals);
-      A.toast(`Đã thêm "${D.dish(dishId).name}" vào ${labels[active].toLowerCase()} ngày ${currentDay}!`);
+      const dishObj=D.dish(dishId);
+      const dishName=dishObj ? dishObj.name : 'Món ăn';
+      const mealName=labels[active] ? labels[active].toLowerCase() : 'bữa ăn';
+      const scrollY=window.scrollY;
+
+      if(dayDishIds.includes(dishId)){
+        D.removeDishFromMeal(s, currentDay, active, dishId);
+        A.save();
+        A.render();
+        window.scrollTo(0, scrollY);
+        A.toast(`Đã hủy món "${dishName}" khỏi ${mealName} ngày ${currentDay}.`);
+      } else {
+        D.addDishToMeal(s, currentDay, active, dishId);
+        A.save();
+        A.render();
+        window.scrollTo(0, scrollY);
+        A.toast(`Đã thêm món "${dishName}" vào ${mealName} ngày ${currentDay}!`);
+      }
       return;
     }
 
