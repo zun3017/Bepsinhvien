@@ -1,7 +1,7 @@
 (function(){
   'use strict';
   const A=window.UI,D=window.Demo,{esc,icon,money,qty}=A;
-  let currentDay=1;
+  let currentDay=null;
   let active=0,query='',stockOnly=false,categoryFilter='all',isAddingMode=false,replaceTargetDishId=null;
 
   function getMealLabels(meals){
@@ -102,7 +102,7 @@
       D.generateMultiDayPlan(s);
       A.save();
     }
-    if(currentDay<1 || currentDay>s.days) currentDay=s.day||1;
+    if(currentDay===null || currentDay<1 || currentDay>s.days) currentDay=s.day||1;
     const labels=getMealLabels(s.meals);
     if(active>=s.meals) active=0;
 

@@ -8,6 +8,44 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../js/demo-data.js'),'ut
 const file=path.join(__dirname,'../js/menu-planner.js');
 if(fs.existsSync(file))vm.runInNewContext(fs.readFileSync(file,'utf8'),context);
 const D=context.window.Demo;
+
+test('đi chợ chỉ tổng hợp món đang chọn, gồm món phụ và bỏ qua danh sách cũ',()=>{
+  const s=D.seed();
+  s.dailyMenus[s.day]=[['tofusandwich'],['tofurice','greensoup'],['tomatorice']];
+  D.repairMenu(s); // Rendering must not replace the user's chosen day.
+  const rows=D.shopping(s);
+  assert.ok(!rows.some(i=>i.key==='egg'||i.key==='chicken'));
+  assert.equal(rows.find(i=>i.key==='tofu').need,5);
+  assert.equal(rows.find(i=>i.key==='rice').need,200);
+  assert.equal(rows.find(i=>i.key==='greens').need,1);
+  s.confirmed=true;
+  D.checkout(s,rows.reduce((n,i)=>n+i.cost,0));
+  assert.equal(s.fridge.find(i=>i.key==='egg').qty,6);
+  assert.ok(!s.logs.at(-1).dishIds.includes('bread'));
+});
+
+test('bỏ món cuối cùng không lấy lại món cũ; ngày trống có danh sách trống',()=>{
+  const s=D.seed();
+  s.dailyMenus[s.day]=[['bread'],['tofurice'],[]];
+  D.removeDishFromMeal(s,s.day,0,'bread');
+  D.repairMenu(s);
+  assert.equal(D.getDayMealDishes(s,s.day,0).length,0);
+  assert.ok(!D.shopping(s).some(i=>i.key==='egg'||i.key==='bread'));
+  s.dailyMenus[s.day]=[];
+  D.repairMenu(s);
+  assert.equal(D.menu(s).length,0);
+  assert.equal(D.shopping(s).length,0);
+});
+
+test('chỉ tính các bữa đang bật và giữ đúng chỉ số bữa khi đổi món',()=>{
+  const s=D.newPlan(500000,10,2);
+  s.mealSlots=[1,2];
+  s.dailyMenus[s.day]=[['bread'],['tofurice'],['tomatorice']];
+  assert.ok(!D.shopping(s).some(i=>i.key==='egg'||i.key==='bread'));
+  const legacy=D.newPlan(500000,10,2);legacy.mealSlots=[1,2];
+  D.replaceDishInMeal(legacy,legacy.day,2,'eggrice','tomatorice');
+  assert.deepEqual(Array.from(D.menu(legacy),d=>d.id),['chicken','tomatorice']);
+});
 test('tìm món không dấu theo tên và nguyên liệu, đúng buổi ăn',()=>{
   assert.equal(typeof D.candidates,'function');
   const s=D.newPlan(500000,10,3);

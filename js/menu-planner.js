@@ -153,9 +153,8 @@
     if(s.checkedOut)throw Error('Ngày này đã cập nhật. Hãy chuyển sang ngày tiếp theo.');
     if(!slots(s).includes(slot)||!candidates(s,slot).some(d=>d.id===id))throw Error('Món không phù hợp buổi ăn, nguyên liệu kiêng hoặc đã ăn hôm trước.');
     if(slots(s).some(i=>i!==slot&&!(s.unfilled||[]).includes(i)&&s.selected[i]===id))throw Error('Món này đã có trong một bữa hôm nay. Hãy chọn món khác.');
+    D.ensureDayMenu(s,s.day);
     s.selected[slot]=id;s.unfilled=(s.unfilled||[]).filter(i=>i!==slot);s.confirmed=false;
-    if(!s.dailyMenus) s.dailyMenus={};
-    if(!s.dailyMenus[s.day]) s.dailyMenus[s.day] = [];
     s.dailyMenus[s.day][slot] = [id];
   }
 
@@ -231,6 +230,17 @@
 
   function repairMenu(s){
     if(s.checkedOut)return false;
+    if(s.dailyMenus && Object.hasOwn(s.dailyMenus,s.day)){
+      // selected is only a compatibility cache. The visible day is authoritative.
+      const before=JSON.stringify([s.selected,s.unfilled||[]]);
+      s.unfilled=[];
+      slots(s).forEach(slot=>{
+        const dishes=D.getDayMealDishes(s,s.day,slot);
+        s.selected[slot]=dishes[0]?.id||'';
+        if(!dishes.length)s.unfilled.push(slot);
+      });
+      return before!==JSON.stringify([s.selected,s.unfilled]);
+    }
     const before=JSON.stringify([s.selected,s.unfilled||[]]),used=new Set(),unfilled=[];
     slots(s).forEach(slot=>{
       const pool=candidates(s,slot);

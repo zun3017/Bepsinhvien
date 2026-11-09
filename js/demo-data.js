@@ -42,28 +42,35 @@
   }
   const dish = id => dishes.find(d => d.id===id);
   const menu = (s,dayNum) => {
-    if (dayNum && s.dailyMenus && s.dailyMenus[dayNum]) {
-      const ids = s.dailyMenus[dayNum].flat();
-      return ids.map(id=>dish(id)).filter(Boolean);
-    }
-    return (s.mealSlots||Array.from({length:s.meals},(_,i)=>i)).filter(i=>!(s.unfilled||[]).includes(i)).map(i=>dish(s.selected[i]));
+    const day = dayNum || s.day;
+    return (s.mealSlots||Array.from({length:s.meals},(_,i)=>i))
+      .flatMap(slot=>getDayMealDishes(s,day,slot));
   };
   function getDayMealDishes(s, dayNum, slot) {
     const day = dayNum || s.day;
-    if (s.dailyMenus && s.dailyMenus[day] && s.dailyMenus[day][slot]) {
+    // Once a day exists, empty/missing slots mean no dish, never a stale fallback.
+    if (s.dailyMenus && Object.hasOwn(s.dailyMenus,day)) {
       const val = s.dailyMenus[day][slot];
-      const ids = Array.isArray(val) ? val : [val];
+      const ids = Array.isArray(val) ? val : val ? [val] : [];
       return ids.map(id => dish(id)).filter(Boolean);
     }
+    if(day!==s.day || (s.unfilled||[]).includes(slot)) return [];
     const selId = s.selected && s.selected[slot];
     return selId && dish(selId) ? [dish(selId)] : [];
   }
-  function addDishToMeal(s, dayNum, slot, dishId) {
+  function ensureDayMenu(s, dayNum) {
     if (!s.dailyMenus) s.dailyMenus = {};
-    const curSlots = s.mealSlots || Array.from({length: s.meals}, (_, i) => i);
-    if (!s.dailyMenus[dayNum]) {
-      s.dailyMenus[dayNum] = curSlots.map(i => [s.selected[i] || 'bread']);
+    if (!Object.hasOwn(s.dailyMenus,dayNum)) {
+      const day=[];
+      (s.mealSlots||Array.from({length:s.meals},(_,i)=>i)).forEach(slot=>{
+        day[slot]=getDayMealDishes(s,dayNum,slot).map(d=>d.id);
+      });
+      s.dailyMenus[dayNum]=day;
     }
+    return s.dailyMenus[dayNum];
+  }
+  function addDishToMeal(s, dayNum, slot, dishId) {
+    ensureDayMenu(s,dayNum);
     if (!Array.isArray(s.dailyMenus[dayNum][slot])) {
       s.dailyMenus[dayNum][slot] = s.dailyMenus[dayNum][slot] ? [s.dailyMenus[dayNum][slot]] : [];
     }
@@ -98,11 +105,7 @@
     if (dayNum === s.day) s.confirmed = false;
   }
   function replaceDishInMeal(s, dayNum, slot, oldDishId, newDishId) {
-    if (!s.dailyMenus) s.dailyMenus = {};
-    const curSlots = s.mealSlots || Array.from({length: s.meals}, (_, i) => i);
-    if (!s.dailyMenus[dayNum]) {
-      s.dailyMenus[dayNum] = curSlots.map(i => [s.selected[i] || 'bread']);
-    }
+    ensureDayMenu(s,dayNum);
     if (!Array.isArray(s.dailyMenus[dayNum][slot])) {
       s.dailyMenus[dayNum][slot] = s.dailyMenus[dayNum][slot] ? [s.dailyMenus[dayNum][slot]] : [];
     }
@@ -166,5 +169,5 @@
     if(s.day>=s.days) throw Error('Đã đến ngày cuối kế hoạch. Xem kết quả tại Lịch sử & Thống kê.');
     s.day++;s.confirmed=false;s.checkedOut=false;s.readNotifications=false;
   }
-  window.Demo={ingredients,dishes,seed,dish,menu,summary,newPlan,usable,shopping,checkout,advance,getDayMealDishes,addDishToMeal,removeDishFromMeal,replaceDishInMeal};
+  window.Demo={ingredients,dishes,seed,dish,menu,summary,newPlan,usable,shopping,checkout,advance,getDayMealDishes,ensureDayMenu,addDishToMeal,removeDishFromMeal,replaceDishInMeal};
 })();
