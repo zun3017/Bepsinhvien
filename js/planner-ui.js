@@ -16,7 +16,7 @@
     if(A.tab==='setup')bindSetup();if(A.tab==='shopping')bindShopping();
   };
   function overview(){const s=A.state,b=Demo.summary(s),used=s.checkedOut?s.day:s.day-1;const alertItems=s.fridge.filter(i=>i.expiry<=s.day+1).sort((a,b)=>b.expiry-a.expiry);
-    return title(`Chào ${esc(s.name.split(' ').slice(-2).join(' '))}, hôm nay ăn gì?`,'Một bữa ăn vừa ý, một khoản chi vừa vặn.',`<span class="date-label">${icon('calendar')} Ngày ${s.day} trong kế hoạch ${s.days} ngày</span>`)+`
+    return title(`Chào bạn, hôm nay ăn gì?`,'Một bữa ăn vừa ý, một khoản chi vừa vặn.',`<span class="date-label">${icon('calendar')} Ngày ${s.day} trong kế hoạch ${s.days} ngày</span>`)+`
     <div class="overview-grid"><section class="panel budget-panel"><div class="budget-top"><h2>Ngân sách của bạn</h2>${icon('wallet')}</div><div class="budget-main number">${new Intl.NumberFormat('vi-VN').format(b.remaining)}<span>đ</span></div><p style="font-size:12px">Số tiền còn lại ${b.daysLeft?'cho '+b.daysLeft+' ngày chưa cập nhật':'khi hoàn thành kế hoạch'}</p><div class="budget-details"><div><small>Ngân sách ban đầu</small><strong class="number">${money(s.budget)}</strong></div><div><small>Đã chi tiêu</small><strong class="number">${money(b.spent)}</strong></div><div><small>${s.checkedOut?'Định mức ngày tiếp theo':'Định mức hôm nay'}</small><strong class="budget-daily number">${b.daysLeft?money(b.allowance):'Đã hoàn tất'}</strong></div></div></section>
     <section class="panel cycle-panel"><div><div class="row between"><h2 style="font-size:15px">Hành trình của bạn</h2>${icon('calendar')}</div><div class="cycle-day number">Ngày ${s.day} <span>/ ${s.days} ngày</span></div><div class="cycle-days" aria-label="Đã hoàn tất ${used} trên ${s.days} ngày">${Array.from({length:Math.min(s.days,30)},(_,i)=>`<span class="${(i+1)/Math.min(s.days,30)<=used/s.days?'done':(i+1)/Math.min(s.days,30)<=s.day/s.days?'current':''}"></span>`).join('')}</div><p class="cycle-note">${used} ngày đã cập nhật · ${s.days-used} ngày còn lại</p></div><button class="btn" data-action="advance" ${disabled(!s.checkedOut||s.day>=s.days)}>Kết thúc ngày & tiếp tục ${icon('arrow')}</button></section>
     <section class="panel"><div class="panel-head"><div><h2>Thực đơn hôm nay</h2><p>${s.checkedOut?'Đã cập nhật bữa ăn và chi tiêu':s.confirmed?'Bạn đã chốt thực đơn':'Một vài gợi ý cho bữa ăn của bạn'}</p></div><button class="text-btn" data-go="menu" style="font-size:12px">Xem tất cả ${icon('arrow')}</button></div><div class="meal-mini-grid">${Demo.menu(s).map((d,i)=>`<article class="meal-mini">${photo(d)}<small>${['Bữa sáng','Bữa trưa','Bữa xế','Bữa tối'][Demo.slots(s)[i]||i]||'Bữa ăn'}</small><h3>${esc(d.name)}</h3><div class="row between"><span class="price number">${money(d.cost)}</span><span class="row time">${icon('clock')}${d.time} phút</span></div></article>`).join('')}</div><p class="caption">Ảnh bữa ăn và chi phí minh họa. Tổng dự chi: ${money(b.estimated)}.</p></section>
@@ -148,7 +148,6 @@
       try{
         const fresh=Demo.newPlan(n,x,m,nut,prefs);
         Object.assign(fresh,{
-          name:A.state.name,
           theme:A.state.theme,
           unit:A.state.unit,
           reminders:A.state.reminders,
