@@ -25,3 +25,17 @@ if(params.get('tab')==='register' || params.get('source')==='propose' || params.
   const descEl = document.querySelector('#auth-description');
   if(descEl) descEl.textContent='Đăng ký tài khoản để tự đề xuất ý tưởng món ăn và lưu trữ kế hoạch của bạn.';
 }
+
+document.querySelector('#demo-enter').onclick = async e => {
+  const button = e.currentTarget;
+  button.disabled = true;
+  const status = document.querySelector('#auth-status');
+  status.textContent = 'Đang mở căn bếp của bạn…';
+  try {
+    await DemoAccount.request('POST');
+    location.href = 'dashboard.html';
+  } catch (error) {
+    status.textContent = error.message;
+    button.disabled = false;
+  }
+};

@@ -34,7 +34,7 @@
     {id:'cucumbersalad',name:'Dưa leo trộn chua ngọt',meal:'Món phụ',category:'phụ',mainIngredient:'cucumber',cost:6000,time:5,image:'breakfast.jpg',tag:'Món phụ thanh mát',needs:{cucumber:1},recipe:'Dưa leo rửa sạch, thái lát mỏng, trộn cùng chút đường, giấm và muối cho ngấm giòn.',desc:'Món dưa leo trộn giòn rụm chua thanh chống ngấy cực tốt cho các món thịt rán.'}
   ];
   function seed() {
-    return {version:1,budget:500000,days:10,day:3,meals:3,name:'Minh Anh',area:'Quanh HCMUS — Nguyễn Văn Cừ',preferences:['Nhiều rau','Ăn chay','Không thịt bò'],nutrition:'Tiết kiệm',theme:'light',reminders:true,unit:'g',selected:['bread','chicken','eggrice'],favorites:[],confirmed:false,checkedOut:false,readNotifications:false,
+    return {version:1,budget:500000,days:10,day:3,meals:3,area:'Quanh HCMUS — Nguyễn Văn Cừ',preferences:['Nhiều rau','Ăn chay','Không thịt bò'],nutrition:'Tiết kiệm',theme:'light',reminders:true,unit:'g',selected:['bread','chicken','eggrice'],favorites:[],confirmed:false,checkedOut:false,readNotifications:false,
       fridge:[{id:'f1',key:'egg',qty:6,expiry:14},{id:'f2',key:'tomato',qty:2,expiry:3},{id:'f3',key:'rice',qty:500,expiry:30},{id:'f4',key:'greens',qty:1,expiry:2}],
       logs:[{day:1,planned:50000,actual:47000,names:['Bánh mì trứng','Cơm gà','Cơm đậu hũ']},{day:2,planned:50000,actual:43000,names:['Bánh mì đậu hũ','Cơm trứng','Cơm gà']}],
       dailyMenus:{}
